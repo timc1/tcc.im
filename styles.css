@@ -1,0 +1,73 @@
+@font-face {
+  font-family: 'univers';
+  src: url('./fonts/univers.ttf');
+  font-weight: 100 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'univers';
+  src: url('./fonts/univers-bold.ttf');
+  font-weight: 600 900;
+  font-style: normal;
+}
+
+:root {
+  --bold: 800;
+  --regular: 400;
+  --basefont: univers,Open Sans,sans-serif;
+}
+
+::selection {
+  background: rgba(15,13,32,0.99); /* WebKit/Blink Browsers */
+  color: #fff;
+}
+::-moz-selection {
+  background: rgba(15,13,32,0.99);/* Gecko Browsers */
+  color: #fff;
+}
+
+* {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: "pnum";
+  font-feature-settings: "pnum";
+  font-variant-numeric: proportional-nums;
+  font-family: var(--basefont);
+}
+html {
+  background: #fff;
+}
+
+body {
+
+  margin: 100px;
+}
+
+section.verse {
+  max-width: 500px;
+}
+
+section.verse p {
+  font-size: 2rem;
+  line-height: 3rem;
+  font-weight: var(--bold);
+  color: rgba(15,13,32,0.99);
+}
+
+section.about {
+  max-width: 500px;
+  margin-left: auto; 
+}
+
+section.about p {
+  font-weight: var(--regular);
+  color: #555553;
+  font-size: 1rem;
+}
+
+footer {
+  max-width: 500px;
+  margin-left: auto;
+}
