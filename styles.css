@@ -15,14 +15,16 @@
   --bold: 800;
   --regular: 400;
   --basefont: univers,Open Sans,sans-serif;
+  --gray: '#555553';
+  --black: rgba(15,13,32,0.99);
 }
 
 ::selection {
-  background: rgba(15,13,32,0.99); /* WebKit/Blink Browsers */
+  background: var(--black); /* WebKit/Blink Browsers */
   color: #fff;
 }
 ::-moz-selection {
-  background: rgba(15,13,32,0.99);/* Gecko Browsers */
+  background: var(--black);/* Gecko Browsers */
   color: #fff;
 }
 
@@ -41,19 +43,24 @@ html {
 }
 
 body {
-
+  position: relative;
+  grid-template-columns: .8fr 1fr;
+  max-width: 1600px;
   margin: 100px;
+  padding: 0 2rem;
+  box-sizing: border-box;
 }
 
 section.verse {
   max-width: 500px;
+  opacity: 0.1;
 }
 
 section.verse p {
   font-size: 2rem;
   line-height: 3rem;
   font-weight: var(--bold);
-  color: rgba(15,13,32,0.99);
+  color: var(--black);
 }
 
 section.about {
@@ -63,11 +70,68 @@ section.about {
 
 section.about p {
   font-weight: var(--regular);
-  color: #555553;
+  color: var(--gray);
   font-size: 1rem;
+}
+
+section.globe {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 600px;
+  width: 1000px;
+  margin-right: calc(-1 * (100px + 2rem))
+}
+
+section.globe canvas {
+  position: relative;
+  width: 100%!important;
+  height: 100%!important;
+  background: #fff;
+  z-index: -1;
 }
 
 footer {
   max-width: 500px;
+  width: 100%;
   margin-left: auto;
+}
+h2.hidden {
+  display: none;
+}
+footer ul {
+  margin: 0;
+  padding: 0;
+  display: -ms-grid;
+  display: grid;
+  grid-gap: 0.99rem;
+  grid-auto-flow: column;
+  grid-auto-columns: -webkit-max-content;
+  grid-auto-columns: max-content;
+}
+footer li {
+  list-style: none;
+}
+footer a {
+  position: relative;
+  text-decoration: none;
+  color: var(--gray); 
+  font-weight: var(--regular);
+  cursor: ne-resize;
+  transition: opacity .2s;
+}
+footer a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--black)
+}
+footer a:hover {
+  opacity: 0.5;
+}
+footer li:not(:last-child)::after {
+  content: "·";
+  margin-left: 0.8rem;
 }
