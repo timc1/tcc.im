@@ -20,6 +20,9 @@
   --black: rgba(15,13,32,0.99);
   --fontlg: 2.5rem;
   --fontsm: .8rem;
+
+  --peoplegridmax: 150px;
+  --cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 ::selection {
@@ -67,6 +70,7 @@ ul {
 
 li {
   list-style: none;
+
 }
 
 section.verse, section.about, footer {
@@ -99,7 +103,7 @@ section.about p {
 section.globe {
   position: relative; 
   width: 1000px;
-  transition: opacity 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transition: opacity 1s var(--cubic);
   margin-left: auto;
   margin-top: -50%;
   overflow: hidden;
@@ -128,28 +132,53 @@ section.globe canvas {
 div.people {
   margin-top: 20px; 
   display: grid;
-  grid-template-columns: max-content 80px auto;
+  grid-template-columns: var(--peoplegridmax) 80px auto;
   grid-gap: 20px;
   align-items: center;
 }
 
-div.people ul {
+div.people {
   position: relative;
 }
 
-div.people ul::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: -10px;
-  bottom: 0;
-  border-right: 1px solid var(--lightgray);
+div.scroll-container {
+  overflow: hidden;
+  position: relative;
 }
 
-div.people li {
+
+div.users {
+  display: flex;
+  transition: .3s var(--cubic);
+}
+
+div.user {
+  width: var(--peoplegridmax);
+  flex-shrink: 0;
+  transition: .25s var(--cubic);
+  transform: scale(.6);
+  opacity: .3;
+}
+
+div.user.active {
+  transform: scale(1); 
+  opacity: 1;
+}
+
+div.user span,
+div.user h3 {
   font-size: var(--fontsm);
+  font-weight: var(--regular);
   color: var(--gray);
-  line-height: 1.2rem;
+  -webkit-line-clamp: 1;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  height: 1.2rem;
+  align-self: start;
+  line-height: 1.2rem !important;
+  margin: 0px;
+  overflow: hidden;
 }
 
 button.arrow-next {
@@ -183,7 +212,7 @@ button.arrow-next::before {
   background: #fff;
   border: 1px solid var(--lightgray);
   transform-property: opacity, transform;
-  transition: .2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transition: .2s var(--cubic);
   opacity: .4;
   transform: scale(.98);
 }

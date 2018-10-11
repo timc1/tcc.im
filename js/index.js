@@ -1,4 +1,5 @@
-;(function() {
+/*;(function() {
+  console.log(
   // Handle view next user button click.
   document.addEventListener('click', function(e) {
     const classname = e.target.getAttribute('class')
@@ -7,4 +8,4 @@
       console.log('next')
     }
   })
-})()
+})()*/
