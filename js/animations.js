@@ -1,5 +1,6 @@
 ;(function() {
-  // Cache DOM selector.
+  // Cache DOM selector. Since we're working within our section.globe we
+  // can simply reference container.whatever instead of document.whatever!!
   const container = document.getElementsByClassName('globe')[0]
   const canvas = container.getElementsByTagName('canvas')[0]
   // Canvas width and height.
@@ -44,8 +45,13 @@
       date: '11.01.2018',
     },
   ]
-  let currentUserIndex = null
-  let previousUserIndex = null
+
+  // A state object to hold visual state.
+  const state = {
+    currentUserIndex: null,
+    previousUserIndex: null,
+    isFormShowing: false,
+  }
 
   // Enter.
   if (checkWebGl()) {
@@ -68,6 +74,7 @@
       }
     } catch (err) {
       if (err) {
+        console.log('error', err)
         fallback()
       }
     }
@@ -88,7 +95,7 @@
 
     setupGlobe()
     setupUsers()
-
+    setupEventListeners()
     render()
 
     setTimeout(() => container.classList.add('show'), 1)
@@ -254,45 +261,100 @@
       `
       finishedMarkup += markup
     })
-    document.getElementsByClassName('users')[0].innerHTML = finishedMarkup
+    container.getElementsByClassName('users')[0].innerHTML = finishedMarkup
 
     // 2.
 
     focusUser()
     // positionGlobe()
-    document.addEventListener('click', function(e) {
-      const classname = e.target.getAttribute('class')
-      const isButton = e.target.tagName === 'BUTTON'
-      if (classname === 'arrow-next' && isButton) {
-        focusUser()
-      }
-    })
   }
 
   function focusUser() {
-    if (currentUserIndex === null) {
+    if (state.currentUserIndex === null) {
       // If there is no current user (when our page first loads), we'll pick one randomly.
-      currentUserIndex = getRandomNumberBetween(0, users.length - 1)
+      state.currentUserIndex = getRandomNumberBetween(0, users.length - 1)
     } else {
       // If we already have an index (page has already been loaded/user already clicked next), we'll continue the sequence.
-      previousUserIndex = currentUserIndex
-      currentUserIndex = (currentUserIndex + 1) % users.length
+      state.previousUserIndex = state.currentUserIndex
+      state.currentUserIndex = (state.currentUserIndex + 1) % users.length
     }
     // 150px is our set width amount. If you change it in the css file (div.users), change it here.
-    // 1. Get the new translateX amount by multiplying the index of the currentUserIndex by 150
+    // 1. Get the new translateX amount by multiplying the index of the state.currentUserIndex by 150
     // 2. Set the new translateX amount * -1 because we're reading from left to right.
-    // 4. Get element of previousUserIndex and remove its 'active' class.
-    // 5. Get the current child div.user through getting the div.user element using currentUserIndex.
-    // 6. Add 'active' class to div.user of currentUserIndex.
+    // 4. Get element of state.previousUserIndex and remove its 'active' class.
+    // 5. Get the current child div.user through getting the div.user element using state.currentUserIndex.
+    // 6. Add 'active' class to div.user of state.currentUserIndex.
 
-    const translateX = currentUserIndex * 150
-    const el = document.getElementsByClassName('users')[0]
+    const translateX = state.currentUserIndex * 150
+    const el = container.getElementsByClassName('users')[0]
     el.style = `transform: translateX(-${translateX}px)`
     const children = el.getElementsByClassName('user')
-    if (previousUserIndex !== null) {
-      children[previousUserIndex].classList.remove('active')
+    if (state.previousUserIndex !== null) {
+      children[state.previousUserIndex].classList.remove('active')
     }
-    children[currentUserIndex].classList.add('active')
+    children[state.currentUserIndex].classList.add('active')
+  }
+
+  function setupEventListeners() {
+    // Setup event listeners for toggling buttons.
+    container.addEventListener('click', function(e) {
+      const isButton = e.target.tagName === 'BUTTON'
+      // Handles displaying the next user and locating them on the globe.
+      if (isButton) {
+        const classname = e.target.getAttribute('class')
+        if (classname.indexOf('arrow-next') !== -1) {
+          focusUser()
+        }
+        if (classname.indexOf('send-wave') !== -1) {
+          toggleForm()
+        }
+      }
+    })
+
+    // Setup event listeners for input/textarea focus/blur
+    const inputs = container.querySelectorAll('input,textarea')
+    inputs.forEach(input => {
+      input.addEventListener('focus', function(e) {
+        // Add focused class
+        e.target.parentNode.classList.remove('empty')
+        e.target.parentNode.classList.add('active')
+      })
+      input.addEventListener('blur', function(e) {
+        // Remove focused class
+        if (e.target.value.length === 0) {
+          e.target.parentNode.classList.add('empty')
+        } else {
+          e.target.parentNode.classList.remove('empty')
+        }
+        e.target.parentNode.classList.remove('active')
+      })
+    })
+
+    // Setup event listener for form.
+    const form = container.getElementsByClassName('send-wave-form')[0]
+    form.addEventListener('submit', function(e) {
+      e.preventDefault()
+      const name = e.target.name.value
+      const message = e.target.message.value
+      console.log('name', name, 'message', message)
+    })
+  }
+
+  function toggleForm() {
+    state.isFormShowing = !state.isFormShowing
+    const form = container.getElementsByClassName('send-wave-form')[0]
+    const toggle = container.getElementsByClassName('send-wave')[0]
+    const input = form.getElementsByTagName('input')[0]
+    if (state.isFormShowing) {
+      form.classList.add('show')
+      toggle.classList.add('exit')
+      if (input) {
+        input.focus()
+      }
+    } else {
+      form.classList.remove('show')
+      toggle.classList.remove('exit')
+    }
   }
 
   function render() {
@@ -303,6 +365,9 @@
     camera.lookAt(0, 100, 0)
     requestAnimationFrame(render)
   }
+
+  // Helpers
+  // =======
 
   // Returns an object of 3D spherical coordinates
   function returnSphericalCoordinates(latitude, longitude) {

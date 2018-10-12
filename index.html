@@ -26,10 +26,36 @@
               <div class="users">
               </div>
             </div>
-            <button class="arrow-next"/>
+            <button class="button arrow-next"></button>
+            <div class="send-wave-container">
+              <button class="button send-wave"></button>
+              <form class="send-wave-form">
+                <div class="input-wrapper empty">
+                  <label for="name">Your name</label>
+                  <input 
+                       type="text"
+                       id="name" 
+                       autocomplete="name"
+                       placeholder="Kim Kardashian"
+                       required
+                       />  
+                </div>
+                <div class="input-wrapper empty">
+                  <label for="message">Add a message</label>
+                  <textarea
+                    type="text" 
+                    id="message"
+                    autocomplete="off"
+                    placeholder="Hello from 🇯🇵 🇦🇺 🇬🇧!"
+                    ></textarea>
+                </div>
+                <div class="carat" />
+              </form>
+            </div>
           </div>
+
         </section>
-             
+                       
         <!--
         <section class="about">
           <p>Hello, I'm Tim. Currently I'm an independent product developer based in Los Angeles.</p>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="33px" height="33px" viewBox="0 0 33 33" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.1 (67048) - http://www.bohemiancoding.com/sketch -->
+    <title>next-arrow</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="next-arrow" fill="#000000">
+            <path d="M32.135,16.817 L0.5,16.817 C0.224,16.817 0,16.593 0,16.317 C0,16.041 0.224,15.817 0.5,15.817 L32.135,15.817 C32.411,15.817 32.635,16.041 32.635,16.317 C32.635,16.593 32.411,16.817 32.135,16.817 Z" id="Path"></path>
+            <path d="M32.3175,16.8175 L0.6825,16.8175 C0.4065,16.8175 0.1825,16.5935 0.1825,16.3175 C0.1825,16.0415 0.4065,15.8175 0.6825,15.8175 L32.3175,15.8175 C32.5935,15.8175 32.8175,16.0415 32.8175,16.3175 C32.8175,16.5935 32.5935,16.8175 32.3175,16.8175 Z" id="Path" transform="translate(16.500000, 16.317500) rotate(90.000000) translate(-16.500000, -16.317500) "></path>
+        </g>
+    </g>
+</svg>

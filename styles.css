@@ -15,14 +15,18 @@
   --bold: 800;
   --regular: 400;
   --basefont: univers,Open Sans,sans-serif;
+  --purple: #bebbff;
   --lightgray: #626177;
   --gray: #38374b;
   --black: rgba(15,13,32,0.99);
   --fontlg: 2.5rem;
+  --fontmd: 1.2rem;
   --fontsm: .8rem;
 
   --peoplegridmax: 150px;
   --cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --cubicbounce: cubic-bezier(0.74, -0.21, 0.51, 1.39);
+  --boxshadow: 0 1px 3px rgba(188, 193, 217, .12), 0 5px 12px rgba(188, 193, 217, .25);
 }
 
 ::selection {
@@ -43,6 +47,7 @@
   font-feature-settings: "pnum";
   font-variant-numeric: proportional-nums;
   font-family: var(--basefont);
+  box-sizing: border-box;
 }
 
 html {
@@ -63,6 +68,14 @@ main {
   box-sizing: border-box;
 }
 
+a, button, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  text-decoration: none;
+}
+
 ul {
   margin: 0;
   padding: 0;
@@ -70,7 +83,85 @@ ul {
 
 li {
   list-style: none;
+}
 
+input, textarea {
+  position: relative;
+  width: 100%;
+  padding: 11px 0 5px 0;
+  color: var(--black);
+  background-color: transparent;
+  border: none;
+  outline: none;
+  font-size: var(--fontmd);
+  text-overflow: ellipsis;
+}
+
+textarea {
+  min-height: 62px;
+  max-height: 150px;
+  min-width: 300px;
+  max-width: 400px;
+}
+
+input::placeholder, 
+textarea::placeholder {
+  transition: opacity .25s var(--cubic);
+  opacity: 0;
+}
+
+div.input-wrapper {
+  position: relative;
+}
+
+div.input-wrapper::after {
+  content: '';
+  position: absolute; 
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--black);
+  transition: transform .25s var(--cubic);
+  transform-origin: 0 0;
+  transform: scaleX(0);
+}
+
+div.input-wrapper.active::after {
+  transition-delay: .25s;
+  transform: scaleX(1); 
+}
+
+div.input-wrapper.active input::placeholder,
+div.input-wrapper.active textarea::placeholder {
+  opacity: 1;
+}
+
+div.input-wrapper.empty label {
+  transform: translateY(5px);
+  opacity: .3;
+}
+
+label {
+  position: absolute;
+  font-size: var(--fontmd);
+  color: var(--black);
+  opacity: 1;
+  width: 100%;
+  transform-origin: 0 0;
+  transform: translateY(-8px) scale(.65);
+  transition-property: opacity, transform;
+  transition: .25s var(--cubic);
+  cursor: default;
+}
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--purple);
+  transition: background-color 100000000s;
+}
+input::placeholder, textarea::placeholder {
+  color: var(--lightgray);
+  opacity: 0;
 }
 
 section.verse, section.about, footer {
@@ -122,6 +213,7 @@ section.globe.show {
 }
 
 section.globe canvas {
+  position: relative;
   width: 100%!important;
   height: auto!important;
   background: transparent;
@@ -132,7 +224,7 @@ section.globe canvas {
 div.people {
   margin-top: 20px; 
   display: grid;
-  grid-template-columns: var(--peoplegridmax) 80px auto;
+  grid-template-columns: var(--peoplegridmax) 80px 80px;
   grid-gap: 20px;
   align-items: center;
 }
@@ -169,7 +261,7 @@ div.user span,
 div.user h3 {
   font-size: var(--fontsm);
   font-weight: var(--regular);
-  color: var(--gray);
+  color: var(--black);
   -webkit-line-clamp: 1;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -181,7 +273,7 @@ div.user h3 {
   overflow: hidden;
 }
 
-button.arrow-next {
+button.button {
   position: relative;
   align-self: stretch;
   outline: none;
@@ -191,18 +283,18 @@ button.arrow-next {
   cursor: pointer;
 }
 
-button.arrow-next:hover::before,
-button.arrow-next:focus::before {
+button.button:hover::before,
+button.button:focus::before {
   opacity: 1;
   transform: scale(1);
 }
 
-button.arrow-next:active::before {
+button.button:active::before {
   transform: scale(.95);
 }
 
 
-button.arrow-next::before {
+button.button::before {
   content: '';
   position: absolute;
   top: 0;
@@ -211,24 +303,78 @@ button.arrow-next::before {
   bottom: 0;
   background: #fff;
   border: 1px solid var(--lightgray);
-  transform-property: opacity, transform;
+  transition-property: opacity, transform;
   transition: .2s var(--cubic);
   opacity: .4;
   transform: scale(.98);
 }
 
-button.arrow-next::after {
+button.button::after {
   content: '';
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   height: 20px;
   width: 30px;
   background: var(--black);
+  transition: transform .25s var(--cubic);
+  transform: translate(-50%, -50%);
+  transform-origin: 0 0;
+}
+
+button.arrow-next::after {
   -webkit-mask: url(/imgs/next-arrow.svg) center bottom / contain no-repeat;
   mask: url(/imgs/next-arrow.svg) center bottom / contain no-repeat;
+}
 
+button.send-wave::after {
+  -webkit-mask: url(/imgs/plus.svg) center bottom / contain no-repeat;
+  mask: url(/imgs/plus.svg) center bottom / contain no-repeat;
+}
+
+button.send-wave.exit::after {
+  transform: rotate(45deg) translate(-50%, -50%);
+}
+
+div.send-wave-container {
+  position: relative;
+  display: inherit;
+  height: 100%;
+  width: 100%;
+}
+
+form.send-wave-form {
+  position: absolute;
+  left: 50%;
+  bottom: 85px;
+  display: grid;
+  grid-gap: 25px;
+  transform: translateX(-50%) scale(.5);
+  border: none;
+  min-width: 300px;
+  padding: 25px;
+  background: #fff;
+  box-shadow: var(--boxshadow);
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  transition: opacity .25s var(--cubic), transform .25s var(--cubicbounce);
+}
+
+form.send-wave-form.show {
+  transform: translateX(-50%) scale(1);
+  pointer-events: initial;
+  opacity: 1;
+}
+
+form.send-wave-form div.carat {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  height: 10px;
+  width: 10px;
+  background: #fff;
 }
 
 footer {
