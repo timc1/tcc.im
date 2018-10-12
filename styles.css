@@ -352,7 +352,7 @@ form.send-wave-form {
   transform: translateX(-50%) scale(.5);
   border: none;
   min-width: 300px;
-  padding: 25px;
+  padding: 35px 30px;
   background: #fff;
   box-shadow: var(--boxshadow);
   pointer-events: none;

@@ -344,16 +344,16 @@
     state.isFormShowing = !state.isFormShowing
     const form = container.getElementsByClassName('send-wave-form')[0]
     const toggle = container.getElementsByClassName('send-wave')[0]
-    const input = form.getElementsByTagName('input')[0]
+    const inputs = form.querySelectorAll('input,textarea')
     if (state.isFormShowing) {
       form.classList.add('show')
       toggle.classList.add('exit')
-      if (input) {
-        input.focus()
-      }
+      inputs[0].focus()
+      inputs.forEach(input => (input.tabIndex = 0))
     } else {
       form.classList.remove('show')
       toggle.classList.remove('exit')
+      inputs.forEach(input => (input.tabIndex = -1))
     }
   }
 
