@@ -1,4 +1,6 @@
 ;(function() {
+  /* Three.js globe inspired by Stripe.com/atlas project and https://codepen.io/Flamov/pen/MozgXb */
+
   // Cache DOM selector. Since we're working within our section.globe we
   // can simply reference container.whatever instead of document.whatever!!
   const container = document.getElementsByClassName('globe')[0]
@@ -6,13 +8,10 @@
   // Canvas width and height.
   const width = 1000
   const height = 850
-  const pos_x = 1800
-  const pos_y = 0
-  const pos_z = 1800
   const globeRadius = 200
   const globeSegments = 64
-  const globeWidth = 2048 / 2
-  const globeHeight = 1024 / 2
+  const globeWidth = 4098 / 2
+  const globeHeight = 1968 / 2
 
   // A group to hold everything.
   const groups = {
@@ -63,7 +62,7 @@
         setup()
       } else {
         data = fetch(
-          'https://s3-us-west-2.amazonaws.com/s.cdpn.io/617753/globe-points.json'
+          'https://s3-us-west-1.amazonaws.com/tcc.im-assets/tcc.im/points.json'
         )
           .then(response => response.json())
           .then(parsed => {
@@ -102,9 +101,9 @@
   }
 
   function setupGlobe() {
-    //const texture = new THREE.TextureLoader().load('imgs/world-map-test.png')
+    // const texture = new THREE.TextureLoader().load('imgs/world-map-test.png')
+
     // Here we will create our own texture instead of loading an image.
-    //const texture = new THREE.TextureLoader().load('imgs/world-map-test.png')
     const textureLoader = new THREE.TextureLoader()
     textureLoader.setCrossOrigin(true)
 
@@ -147,7 +146,7 @@
     scene.add(groups.globe)
 
     addPoints()
-    addTestPoint()
+    addUserPoint()
   }
 
   function addPoints() {
@@ -158,17 +157,23 @@
     const material = new THREE.MeshBasicMaterial({
       color: '#626177',
     })
-    console.log(data)
 
     for (let point of data.points) {
       // Transform our latitude and longitude values to points on the sphere.
-      const pos = returnSphericalCoordinates(point.x, point.y)
-      // Position ping item.
-      pingGeometry.translate(pos.x, pos.y, pos.z)
-      // Merge ping item onto our mergedGeometry object.
-      mergedGeometry.merge(pingGeometry)
-      // Reset ping item position.
-      pingGeometry.translate(-pos.x, -pos.y, -pos.z)
+      const pos = convertFlatCoordsToSphereCoords(
+        point.x,
+        point.y,
+        globeRadius,
+        globeHeight
+      )
+      if (pos.x && pos.y && pos.z) {
+        // Position ping item.
+        pingGeometry.translate(pos.x, pos.y, pos.z)
+        // Merge ping item onto our mergedGeometry object.
+        mergedGeometry.merge(pingGeometry)
+        // Reset ping item position.
+        pingGeometry.translate(-pos.x, -pos.y, -pos.z)
+      }
     }
 
     // We end up with 1 mesh to add to the scene rather than our (n) number of points.
@@ -178,68 +183,24 @@
     scene.add(groups.globePoints)
   }
 
-  function getXY(lat, lng) {
-    const y = (-1 * lat + 90) * (globeHeight / 180)
-    const x = (lng + 180) * (globeWidth / 360)
-    return { x, y }
-  }
-
-  function addTestPoint() {
-    const testData = [
-      // Hong kong
-      { lat: 22.3964, lng: 114.1095 },
-      // SF
-      { lat: 37.7749, lng: -122.4194 },
-      //{ x: 37.7749, y: -122.4194 },
-      //{ x: 39.9042, y: 116.4074 },
-      //{ x: 48.1640625, y: 48.8671875 },
-      //{ x: 750, y: 234 },
-      //{ x: 768, y: 342 },
-      //{ x: 813, y: 387 },
-    ]
-
+  function addUserPoint() {
     const mergedGeometry = new THREE.Geometry()
     const pingGeometry = new THREE.SphereGeometry(3, 3, 3)
     // The material that our ping will be created from.
     const material = new THREE.MeshBasicMaterial({ color: 0x000a12 })
-    for (let point of testData) {
-      const pos = test(point.lat, point.lng)
-      console.log(pos)
+    for (let user of users) {
+      const pos = convertLatLngToSphereCoords(
+        user.geo.lat,
+        user.geo.lng,
+        globeRadius,
+        -1
+      )
       pingGeometry.translate(pos.x, pos.y, pos.z)
       mergedGeometry.merge(pingGeometry)
       pingGeometry.translate(-pos.x, -pos.y, -pos.z)
     }
     const total = new THREE.Mesh(mergedGeometry, material)
     scene.add(total)
-  }
-
-  function test(lat, lon) {
-    const radius = globeRadius
-    const height = globeHeight
-    const phi = (lat * Math.PI) / 180
-    const theta = ((lon - 180) * Math.PI) / 180
-    const x = -(radius + height) * Math.cos(phi) * Math.cos(theta)
-    const y = (radius + height) * Math.sin(phi)
-    const z = (radius + height) * Math.cos(phi) * Math.sin(theta)
-    return new THREE.Vector3(x, y, z)
-    /*
-    latitude = ((latitude - globeWidth) / globeWidth) * -180
-    longitude = ((longitude - globeHeight) / globeHeight) * -90
-
-    // Calculate the projected starting point
-    var radius = Math.cos((longitude / 180) * Math.PI) * globeRadius
-    var targetX = Math.cos((latitude / 180) * Math.PI) * radius
-    var targetY = Math.sin((longitude / 180) * Math.PI) * globeRadius
-    var targetZ = Math.sin((latitude / 180) * Math.PI) * radius
-
-    return {
-      x: targetX,
-      y: targetY,
-      z: targetZ,
-      lat: latitude,
-      lng: longitude,
-    }
-    */
   }
 
   function setupUsers() {
@@ -264,7 +225,6 @@
     container.getElementsByClassName('users')[0].innerHTML = finishedMarkup
 
     // 2.
-
     focusUser()
     // positionGlobe()
   }
@@ -336,7 +296,6 @@
       e.preventDefault()
       const name = e.target.name.value
       const message = e.target.message.value
-      console.log('name', name, 'message', message)
     })
   }
 
@@ -359,7 +318,7 @@
 
   function render() {
     renderer.render(scene, camera)
-    const timer = Date.now() * 0.0001
+    const timer = Date.now() * 0.00001
     camera.position.x = Math.cos(timer) * 400
     camera.position.z = Math.sin(timer) * 400
     camera.lookAt(0, 100, 0)
@@ -369,15 +328,18 @@
   // Helpers
   // =======
 
-  // Returns an object of 3D spherical coordinates
-  function returnSphericalCoordinates(latitude, longitude) {
-    /*
-      This function will take a latitude and longitude and calcualte the
-      projected 3D coordiantes using Mercator projection relative to the
-      radius of the globe.
+  function convertLatLngToSphereCoords(lat, lon, radius, height) {
+    const phi = (lat * Math.PI) / 180
+    const theta = ((lon - 180) * Math.PI) / 180
+    const x = -(radius + height) * Math.cos(phi) * Math.cos(theta)
+    const y = (radius + height) * Math.sin(phi)
+    const z = (radius + height) * Math.cos(phi) * Math.sin(theta)
+    return { x, y, z }
+  }
 
-      Reference: https://stackoverflow.com/a/12734509
-   	*/
+  function convertFlatCoordsToSphereCoords(latitude, longitude) {
+    //Calculate the relative 3d coordinates using Mercator projection relative to
+    //the radius of the globe.
 
     // Convert latitude and longitude on the 90/180 degree axis
     latitude = ((latitude - globeWidth) / globeWidth) * -180
@@ -393,8 +355,6 @@
       x: targetX,
       y: targetY,
       z: targetZ,
-      lat: latitude,
-      lng: longitude,
     }
   }
 
