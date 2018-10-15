@@ -19,7 +19,7 @@
   --lightgray: #626177;
   --gray: #38374b;
   --black: rgba(15,13,32,0.99);
-  --fontlg: 2.5rem;
+  --fontlg: 2.2rem;
   --fontmd: 1.2rem;
   --fontsm: .8rem;
 
@@ -88,12 +88,13 @@ li {
 input, textarea {
   position: relative;
   width: 100%;
-  padding: 11px 0 5px 0;
+  padding: 15px 0 5px 0;
   color: var(--black);
   background-color: transparent;
   border: none;
   outline: none;
   font-size: var(--fontmd);
+  line-height: var(--fontmd);
   text-overflow: ellipsis;
 }
 
@@ -106,6 +107,8 @@ textarea {
 
 input::placeholder, 
 textarea::placeholder {
+  font-size: var(--fontmd);
+  color: var(--black);
   transition: opacity .25s var(--cubic);
   opacity: 0;
 }
@@ -134,17 +137,19 @@ div.input-wrapper.active::after {
 
 div.input-wrapper.active input::placeholder,
 div.input-wrapper.active textarea::placeholder {
-  opacity: 1;
+  opacity: .3;
 }
 
 div.input-wrapper.empty label {
-  transform: translateY(5px);
+  transform: translateY(14px);
+  cursor: text;
   opacity: .3;
 }
 
 label {
   position: absolute;
   font-size: var(--fontmd);
+  background: #fff;
   color: var(--black);
   opacity: 1;
   width: 100%;
@@ -153,6 +158,7 @@ label {
   transition-property: opacity, transform;
   transition: .25s var(--cubic);
   cursor: default;
+  z-index: 1;
 }
 
 input:-webkit-autofill {
@@ -165,19 +171,19 @@ input::placeholder, textarea::placeholder {
 }
 
 section.verse, section.about, footer {
-  margin-left: 100px;
+  margin-left: 150px;
 }
 
 section.verse {
-  margin-top: 100px;
-  max-width: 550px;
+  margin-top: 150px;
+  max-width: 500px;
   z-index: 1;
 }
 
 section.verse p {
   font-size: var(--fontlg);
   line-height: 3rem;
-  font-weight: var(--regular);
+  font-weight: var(--bold);
   color: var(--black);
 }
 
@@ -193,10 +199,10 @@ section.about p {
 
 section.globe {
   position: relative; 
-  width: 1000px;
+  width: 900px;
   transition: opacity 1s var(--cubic);
   margin-left: auto;
-  margin-top: -50%;
+  margin-top: -45%;
   overflow: hidden;
   opacity: 0;
   margin-bottom: 200px; 
@@ -217,11 +223,13 @@ section.globe canvas {
   width: 100%!important;
   height: auto!important;
   background: transparent;
-  -webkit-mask-image: linear-gradient(180deg,#000,#000 calc(100% - 40px),transparent);
   z-index: -1;
+  transform: translate(12%, 33%) scale(1.6);
 }
 
 div.people {
+  position: relative;
+  background: #fff;
   margin-top: 20px; 
   display: grid;
   grid-template-columns: var(--peoplegridmax) 80px 80px;
@@ -229,8 +237,14 @@ div.people {
   align-items: center;
 }
 
-div.people {
-  position: relative;
+div.people::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
 }
 
 div.scroll-container {
@@ -378,7 +392,7 @@ form.send-wave-form div.carat {
 }
 
 footer {
-  margin-bottom: 100px;
+  margin-bottom: 150px;
   max-width: 500px;
   width: 100%;
 }
@@ -421,3 +435,4 @@ footer li:not(:last-child)::after {
   content: "·";
   margin-left: 0.8rem;
 }
+

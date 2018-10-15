@@ -28,22 +28,23 @@
             </div>
             <button 
               class="button arrow-next"
-              aria-label="Toggle button to view next user and their location on the globe" ></button>
+              aria-label="Toggle to view another user's location on the globe."></button>
             <div class="send-wave-container">
               <button 
-                class="button send-wave" 
-                aria-label="Toggle button to submit your location"></button>
+                class="button send-wave"
+                aria-label="Toggle a form to submit your own location on the globe."></button>
               <form class="send-wave-form">
                 <div class="input-wrapper empty">
                   <label for="name">Your name</label>
                   <input 
-                       type="text"
-                       id="name" 
-                       autocomplete="name"
-                       placeholder="Kim Kardashian"
-                       tab-index="-1"
-                       required
-                       />  
+                     type="text"
+                     id="name" 
+                     autocomplete="off"
+                     spellcheck="off"
+                     placeholder="Dwayne Johnson"
+                     tabindex="-1"
+                     required
+                     />  
                 </div>
                 <div class="input-wrapper empty">
                   <label for="message">Add a message</label>
@@ -51,8 +52,9 @@
                     type="text" 
                     id="message"
                     autocomplete="off"
+                    spellcheck="off"
                     placeholder="Hello from 🇯🇵 🇦🇺 🇬🇧!"
-                    tab-index="-1"
+                    tabindex="-1"
                     ></textarea>
                 </div>
                 <div class="carat" />
@@ -91,6 +93,7 @@
       </main>
 
       <script src="js/three.min.js"></script>
+      <script src="js/orbital-controls.js"></script>
       <script src="js/animations.js" async></script>
       <script src="js/index.js"></script>
     </body>

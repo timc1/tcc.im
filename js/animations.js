@@ -7,7 +7,7 @@
   const canvas = container.getElementsByTagName('canvas')[0]
   // Canvas width and height.
   const width = 1000
-  const height = 850
+  const height = 800
   const globeRadius = 200
   const globeSegments = 64
   const globeWidth = 4098 / 2
@@ -17,10 +17,38 @@
   const groups = {
     globe: null,
     globePoints: null,
+    userPoints: null,
   }
 
-  // Three.js variables.
-  let data, scene, renderer, camera, globe
+  /**
+   * Three.js variables and properties we need to keep track of.
+   *
+   * @property {Array} data
+   * @property {Object} scene
+   * @property {Object} renderer
+   * @property {Object} camera
+   * @property {Object} globe
+   * @property {Object} pivot
+   */
+  let data, scene, renderer, globe, pivot
+  const camera = {
+    object: null,
+    orbitControls: null,
+    angles: {
+      current: {
+        azimuthal: null,
+        polar: null,
+      },
+      target: {
+        azimuthal: null,
+        polar: null,
+      },
+    },
+    transition: {
+      current: 0,
+      target: 50,
+    },
+  }
   // User data
   const users = [
     {
@@ -35,12 +63,17 @@
     },
     {
       name: 'More Friend',
-      geo: { lat: 40.7128, lng: -74.006, name: 'New York, NY' },
+      geo: { lat: 39.913818, lng: 116.363625, name: 'Beijing, CH' },
       date: '11.08.2018',
     },
     {
       name: 'Tims Mom',
-      geo: { lat: 40.7128, lng: -74.006, name: 'New York, NY' },
+      geo: { lat: 51.5074, lng: 0.1278, name: 'London, UK' },
+      date: '11.01.2018',
+    },
+    {
+      name: 'Test',
+      geo: { lat: 35.6895, lng: 139.6917, name: 'Tokyo, JP' },
       date: '11.01.2018',
     },
   ]
@@ -50,6 +83,7 @@
     currentUserIndex: null,
     previousUserIndex: null,
     isFormShowing: false,
+    isGlobeAnimating: false,
   }
 
   // Enter.
@@ -83,7 +117,8 @@
 
   function setup() {
     scene = new THREE.Scene()
-    camera = new THREE.PerspectiveCamera(45, width / height, 1, 4000)
+    camera.object = new THREE.PerspectiveCamera(45, width / height, 1, 4000)
+    camera.object.position.z = -400
 
     renderer = new THREE.WebGLRenderer({
       canvas: canvas,
@@ -93,6 +128,11 @@
     renderer.setSize(width, height)
 
     setupGlobe()
+    // setupPivot will place our entire globe (the base mesh, points that make up the globe, userPoints)
+    // all in one Three.Group. This way, we can rotate this one Group rather than the camera.
+    // We can then use the camera to look at specific parts of the globe and not have to do much calculations.
+    setupPivot()
+    setupOrbitControls()
     setupUsers()
     setupEventListeners()
     render()
@@ -143,7 +183,7 @@
     groups.globe = globe
     groups.globe.name = 'Globe'
 
-    scene.add(groups.globe)
+    //scene.add(groups.globe)
 
     addPoints()
     addUserPoint()
@@ -152,7 +192,7 @@
   function addPoints() {
     const mergedGeometry = new THREE.Geometry()
     // The geometry that will contain all of our points.
-    const pingGeometry = new THREE.SphereGeometry(0.5, 0.5, 0.5)
+    const pingGeometry = new THREE.SphereGeometry(0.3, 0.3, 0.3)
     // The material that our ping will be created from.
     const material = new THREE.MeshBasicMaterial({
       color: '#626177',
@@ -160,12 +200,8 @@
 
     for (let point of data.points) {
       // Transform our latitude and longitude values to points on the sphere.
-      const pos = convertFlatCoordsToSphereCoords(
-        point.x,
-        point.y,
-        globeRadius,
-        globeHeight
-      )
+      const pos = convertFlatCoordsToSphereCoords(point.x, point.y)
+
       if (pos.x && pos.y && pos.z) {
         // Position ping item.
         pingGeometry.translate(pos.x, pos.y, pos.z)
@@ -180,7 +216,7 @@
     const total = new THREE.Mesh(mergedGeometry, material)
     groups.globePoints = total
     groups.globePoints.name = 'Globe Points'
-    scene.add(groups.globePoints)
+    //scene.add(groups.globePoints)
   }
 
   function addUserPoint() {
@@ -189,18 +225,34 @@
     // The material that our ping will be created from.
     const material = new THREE.MeshBasicMaterial({ color: 0x000a12 })
     for (let user of users) {
-      const pos = convertLatLngToSphereCoords(
-        user.geo.lat,
-        user.geo.lng,
-        globeRadius,
-        -1
-      )
+      const pos = convertLatLngToSphereCoords(user.geo.lat, user.geo.lng)
       pingGeometry.translate(pos.x, pos.y, pos.z)
       mergedGeometry.merge(pingGeometry)
       pingGeometry.translate(-pos.x, -pos.y, -pos.z)
     }
     const total = new THREE.Mesh(mergedGeometry, material)
-    scene.add(total)
+    groups.userPoints = total
+    groups.userPoints.name = 'User Points'
+    //scene.add(groups.userPoints)
+  }
+
+  function setupPivot() {
+    pivot = new THREE.Group()
+    scene.add(pivot)
+    pivot.add(groups.globe)
+    pivot.add(groups.globePoints)
+    pivot.add(groups.userPoints)
+  }
+
+  function setupOrbitControls() {
+    camera.orbitControls = new THREE.OrbitControls(camera.object, canvas)
+    camera.orbitControls.enableKeys = false
+    camera.orbitControls.enablePan = false
+    camera.orbitControls.enableZoom = false
+    camera.orbitControls.enableDamping = false
+    camera.orbitControls.enableRotate = false
+    camera.object.position.z = -550
+    camera.orbitControls.update()
   }
 
   function setupUsers() {
@@ -226,7 +278,6 @@
 
     // 2.
     focusUser()
-    // positionGlobe()
   }
 
   function focusUser() {
@@ -253,6 +304,35 @@
       children[state.previousUserIndex].classList.remove('active')
     }
     children[state.currentUserIndex].classList.add('active')
+
+    focusGlobe()
+  }
+
+  function focusGlobe() {
+    // 1. We'll get the current user's lat/lng
+    // 2. Set camera.angles.current
+    // 3. Calculate and set camera.angles.target
+    // 4. animate method will handle animating
+
+    const { geo } = users[state.currentUserIndex]
+    camera.angles.current.azimuthal = camera.orbitControls.getAzimuthalAngle()
+    camera.angles.current.polar = camera.orbitControls.getPolarAngle()
+
+    /*
+    const t = convertLatLngToSphereCoords(geo.lat, geo.lng)
+    const test = calc2Dpoint(t.x, t.y, t.z)
+    */
+
+    //const { x, y, z } = convertLatLngToSphereCoords(geo.lat, geo.lng)
+    //console.log(x, y, z)
+    const { x, y } = convertLatLngToFlatCoords(geo.lat, geo.lng)
+
+    const { azimuthal, polar } = returnCameraAngles(x, y)
+    camera.angles.target.azimuthal = azimuthal
+    camera.angles.target.polar = polar
+
+    // Updating state here will make sure our animate method will rotate our globe to the next point.
+    state.isGlobeAnimating = true
   }
 
   function setupEventListeners() {
@@ -317,39 +397,77 @@
   }
 
   function render() {
-    renderer.render(scene, camera)
-    const timer = Date.now() * 0.00001
-    camera.position.x = Math.cos(timer) * 400
-    camera.position.z = Math.sin(timer) * 400
-    camera.lookAt(0, 100, 0)
+    renderer.render(scene, camera.object)
     requestAnimationFrame(render)
+    animate()
+  }
+
+  function animate() {
+    if (state.isGlobeAnimating) {
+      // Here we update azimuthal and polar angles.
+      // Our focusGlobe() method will trigger state.isGlobeAnimating
+      // and update the current and target azimuthal/polar angles of
+      // our camera. Then, animateGlobeToNextLocation() will
+      // animate globe from the current azimuthal/polar angles to the target.
+      // It will then set state.isGlobeAnimating to false when the angles are equal.
+      animateGlobeToNextLocation()
+      camera.orbitControls.update()
+    }
+  }
+
+  function animateGlobeToNextLocation() {
+    const { current, target } = camera.transition
+    if (current <= target) {
+      const progress = easeInOutQuad(current / target)
+
+      const {
+        current: { azimuthal: currentAzimuthal, polar: currentPolar },
+        target: { azimuthal: targetAzimuthal, polar: targetPolar },
+      } = camera.angles
+
+      var azimuthalDifference = (currentAzimuthal - targetAzimuthal) * progress
+      azimuthalDifference = currentAzimuthal - azimuthalDifference
+      camera.orbitControls.setAzimuthalAngle(azimuthalDifference)
+
+      var polarDifference = (currentPolar - targetPolar) * progress
+      polarDifference = currentPolar - polarDifference
+      camera.orbitControls.setPolarAngle(polarDifference)
+
+      camera.transition.current++
+    } else {
+      state.isGlobeAnimating = false
+      camera.transition.current = 0
+    }
   }
 
   // Helpers
   // =======
 
-  function convertLatLngToSphereCoords(lat, lon, radius, height) {
-    const phi = (lat * Math.PI) / 180
-    const theta = ((lon - 180) * Math.PI) / 180
-    const x = -(radius + height) * Math.cos(phi) * Math.cos(theta)
-    const y = (radius + height) * Math.sin(phi)
-    const z = (radius + height) * Math.cos(phi) * Math.sin(theta)
+  function convertLatLngToSphereCoords(latitude, longitude) {
+    const phi = (latitude * Math.PI) / 180
+    const theta = ((longitude - 180) * Math.PI) / 180
+    const x = -(globeRadius + -1) * Math.cos(phi) * Math.cos(theta)
+    const y = (globeRadius + -1) * Math.sin(phi)
+    const z = (globeRadius + -1) * Math.cos(phi) * Math.sin(theta)
     return { x, y, z }
   }
 
-  function convertFlatCoordsToSphereCoords(latitude, longitude) {
+  function convertFlatCoordsToSphereCoords(x, y) {
     //Calculate the relative 3d coordinates using Mercator projection relative to
     //the radius of the globe.
 
     // Convert latitude and longitude on the 90/180 degree axis
-    latitude = ((latitude - globeWidth) / globeWidth) * -180
-    longitude = ((longitude - globeHeight) / globeHeight) * -90
+    let latitude = ((x - globeWidth) / globeWidth) * -180
+    let longitude = ((y - globeHeight) / globeHeight) * -90
+
+    latitude = (latitude * Math.PI) / 180 //(latitude / 180) * Math.PI
+    longitude = (longitude * Math.PI) / 180 //(longitude / 180) * Math.PI
 
     // Calculate the projected starting point
-    var radius = Math.cos((longitude / 180) * Math.PI) * globeRadius
-    var targetX = Math.cos((latitude / 180) * Math.PI) * radius
-    var targetY = Math.sin((longitude / 180) * Math.PI) * globeRadius
-    var targetZ = Math.sin((latitude / 180) * Math.PI) * radius
+    const radius = Math.cos(longitude) * globeRadius
+    const targetX = Math.cos(latitude) * radius
+    const targetY = Math.sin(longitude) * globeRadius
+    const targetZ = Math.sin(latitude) * radius
 
     return {
       x: targetX,
@@ -358,10 +476,30 @@
     }
   }
 
+  function convertLatLngToFlatCoords(latitude, longitude) {
+    // Reference: https://stackoverflow.com/questions/7019101/convert-pixel-location-to-latitude-longitude-vise-versa
+    const x = Math.round((longitude + 180) * (globeWidth / 360)) * 2
+    const y = Math.round((-1 * latitude + 90) * (globeHeight / 180)) * 2
+    return { x, y }
+  }
+  // Returns an object of the azimuthal and polar angles of a given a points x,y coord on the globe
+  function returnCameraAngles(x, y) {
+    let targetAzimuthalAngle = ((x - globeWidth) / globeWidth) * Math.PI
+    targetAzimuthalAngle = targetAzimuthalAngle + Math.PI / 2
+    targetAzimuthalAngle += 0.3 // Add a small horizontal offset
+    let targetPolarAngle = (y / (globeHeight * 2)) * Math.PI
+    targetPolarAngle += 0.3 // Add a small vertical offset
+    return {
+      azimuthal: targetAzimuthalAngle,
+      polar: targetPolarAngle,
+    }
+  }
+  function easeInOutQuad(t) {
+    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+  }
   function getRandomNumberBetween(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
-
   function checkWebGl() {
     const gl =
       canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
