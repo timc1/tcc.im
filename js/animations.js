@@ -49,6 +49,10 @@
       target: 50,
     },
   }
+  // This keeps track of the values we'll use to animate in and out the globe popup.
+  const popup = {
+    cacheVertices: null,
+  }
   // User data
   const users = [
     {
@@ -84,6 +88,7 @@
     previousUserIndex: null,
     isFormShowing: false,
     isGlobeAnimating: false,
+    currentPopupElement: null,
   }
 
   // Enter.
@@ -186,7 +191,7 @@
     //scene.add(groups.globe)
 
     addPoints()
-    addUserPoint()
+    //addUserPoint()
   }
 
   function addPoints() {
@@ -219,6 +224,7 @@
     //scene.add(groups.globePoints)
   }
 
+  /*
   function addUserPoint() {
     const mergedGeometry = new THREE.Geometry()
     const pingGeometry = new THREE.SphereGeometry(3, 3, 3)
@@ -235,13 +241,14 @@
     groups.userPoints.name = 'User Points'
     //scene.add(groups.userPoints)
   }
+  */
 
   function setupPivot() {
     pivot = new THREE.Group()
     scene.add(pivot)
     pivot.add(groups.globe)
     pivot.add(groups.globePoints)
-    pivot.add(groups.userPoints)
+    //pivot.add(groups.userPoints)
   }
 
   function setupOrbitControls() {
@@ -318,13 +325,6 @@
     camera.angles.current.azimuthal = camera.orbitControls.getAzimuthalAngle()
     camera.angles.current.polar = camera.orbitControls.getPolarAngle()
 
-    /*
-    const t = convertLatLngToSphereCoords(geo.lat, geo.lng)
-    const test = calc2Dpoint(t.x, t.y, t.z)
-    */
-
-    //const { x, y, z } = convertLatLngToSphereCoords(geo.lat, geo.lng)
-    //console.log(x, y, z)
     const { x, y } = convertLatLngToFlatCoords(geo.lat, geo.lng)
 
     const { azimuthal, polar } = returnCameraAngles(x, y)
@@ -332,7 +332,10 @@
     camera.angles.target.polar = polar
 
     // Updating state here will make sure our animate method will rotate our globe to the next point.
+    // It will also make sure we update & cache our currentPopupElement so we can use it in our animateGlobeToNextLocation.
     state.isGlobeAnimating = true
+    state.currentPopupElement = container.getElementsByClassName('content')[0]
+    animatePopup('HIDE')
   }
 
   function setupEventListeners() {
@@ -437,7 +440,47 @@
     } else {
       state.isGlobeAnimating = false
       camera.transition.current = 0
+      // Animate and display popup
+      animatePopup('SHOW')
     }
+  }
+
+  function animatePopup(action) {
+    const el = state.currentPopupElement
+    let x, y, scale
+    if (action === 'SHOW') {
+      const user = users[state.currentUserIndex]
+      const coords = convertLatLngToSphereCoords(user.geo.lat, user.geo.lng)
+
+      const projected = getProjectedPosition(
+        canvas.clientWidth / 2,
+        canvas.clientHeight / 2,
+        coords,
+        el.clientWidth,
+        el.clientHeight
+      )
+      x = projected.x
+      y = projected.y
+
+      // Set popup.cacheVertices
+      popup.cacheVertices = { x, y }
+      scale = 1
+      el.classList.add('animating')
+    } else {
+      // Ignore initial load 'hide' since the popup element is already going to be hidden.
+      if (!popup.cacheVertices) return
+      x = popup.cacheVertices.x
+      y = popup.cacheVertices.y
+      scale = 0
+      el.classList.remove('animating')
+    }
+
+    el.style.webkitTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
+    el.style.WebkitTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
+    el.style.mozTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
+    el.style.msTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
+    el.style.oTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
+    el.style.transform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
   }
 
   // Helpers
@@ -449,7 +492,7 @@
     const x = -(globeRadius + -1) * Math.cos(phi) * Math.cos(theta)
     const y = (globeRadius + -1) * Math.sin(phi)
     const z = (globeRadius + -1) * Math.cos(phi) * Math.sin(theta)
-    return { x, y, z }
+    return new THREE.Vector3(x, y, z)
   }
 
   function convertFlatCoordsToSphereCoords(x, y) {
@@ -482,6 +525,24 @@
     const y = Math.round((-1 * latitude + 90) * (globeHeight / 180)) * 2
     return { x, y }
   }
+
+  // Returns a 2d position based off of the canvas width and height to position popups on the globe.
+  function getProjectedPosition(
+    width,
+    height,
+    position,
+    contentWidth,
+    contentHeight
+  ) {
+    position = position.clone()
+    var projected = position.project(camera.object)
+
+    return {
+      x: projected.x * width + width - contentWidth / 2,
+      y: -(projected.y * height) + height - contentHeight - 10, // -10 for a small offset
+    }
+  }
+
   // Returns an object of the azimuthal and polar angles of a given a points x,y coord on the globe
   function returnCameraAngles(x, y) {
     let targetAzimuthalAngle = ((x - globeWidth) / globeWidth) * Math.PI
@@ -494,12 +555,15 @@
       polar: targetPolarAngle,
     }
   }
+
   function easeInOutQuad(t) {
     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
   }
+
   function getRandomNumberBetween(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
+
   function checkWebGl() {
     const gl =
       canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
@@ -509,6 +573,7 @@
       return false
     }
   }
+
   function fallback() {
     container.innerHTML =
       'Your browser does not support this part of the page! 😭 Use another browser to experience it!'
