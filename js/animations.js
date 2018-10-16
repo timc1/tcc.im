@@ -161,7 +161,7 @@
     )
     canvasGradient.addColorStop(0, '#fff')
     canvasGradient.addColorStop(0.5, '#fff')
-    canvasGradient.addColorStop(1, '#f7f7f7')
+    canvasGradient.addColorStop(1, '#fff')
     canvasContext.fillStyle = canvasGradient
     canvasContext.fill()
 
@@ -192,7 +192,7 @@
   function addPoints() {
     const mergedGeometry = new THREE.Geometry()
     // The geometry that will contain all of our points.
-    const pingGeometry = new THREE.SphereGeometry(0.3, 0.3, 0.3)
+    const pingGeometry = new THREE.SphereGeometry(0.5, 5, 5)
     // The material that our ping will be created from.
     const material = new THREE.MeshBasicMaterial({
       color: '#626177',
@@ -488,7 +488,7 @@
     targetAzimuthalAngle = targetAzimuthalAngle + Math.PI / 2
     targetAzimuthalAngle += 0.3 // Add a small horizontal offset
     let targetPolarAngle = (y / (globeHeight * 2)) * Math.PI
-    targetPolarAngle += 0.3 // Add a small vertical offset
+    targetPolarAngle += 0.1 // Add a small vertical offset
     return {
       azimuthal: targetAzimuthalAngle,
       polar: targetPolarAngle,
