@@ -15,6 +15,7 @@
   --bold: 800;
   --regular: 400;
   --basefont: univers,Open Sans,sans-serif;
+  --lightpurple: #f3f1ff;
   --purple: #bebbff;
   --lightgray: #626177;
   --gray: #38374b;
@@ -138,7 +139,7 @@ div.input-wrapper.active::after {
 
 div.input-wrapper.active input::placeholder,
 div.input-wrapper.active textarea::placeholder {
-  opacity: .3;
+  opacity: .5;
 }
 
 div.input-wrapper.empty label {
@@ -146,6 +147,7 @@ div.input-wrapper.empty label {
   cursor: text;
   opacity: .3;
 }
+
 
 label {
   position: absolute;
@@ -171,6 +173,71 @@ input::placeholder, textarea::placeholder {
   opacity: 0;
 }
 
+button.submit-button {
+  background: none; 
+  border: none;
+  width: max-content;
+  margin-left: auto;
+  padding: 0;
+  outline: none;
+  cursor: pointer;
+  transition: transform .2s var(--cubic);
+}
+
+button.submit-button:hover>div::before,
+button.submit-button:focus>div::before {
+  opacity: 0; 
+}
+
+button.submit-button:hover>div::after,
+button.submit-button:focus>div::after {
+  opacity: 1; 
+}
+
+button.submit-button:hover,
+button.submit-button:focus {
+  transform: translateY(-1px);
+}
+button.submit-button:active {
+  transform: translateY(1px);
+}
+
+button.submit-button>div {
+  position: relative;
+  height: inherit;
+  background: #fff;
+  font-size: var(--fontsm);
+  font-weight: var(--bold);
+  text-transform: uppercase;
+  color: var(--black);
+  padding: 0.85rem;
+
+}
+
+button.submit-button>div::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid var(--lightgray);
+  transition: opacity .25s var(--cubic);
+}
+
+button.submit-button>div::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid transparent;
+  box-shadow: var(--boxshadow);
+  opacity: 0;
+  transition: opacity .25s var(--cubic);
+}
+
 section.verse, section.about, footer {
   margin-left: 8%;
 }
@@ -179,6 +246,7 @@ section.verse {
   margin-top: 8%;
   max-width: 500px;
   z-index: 1;
+  opacity: .1;
 }
 
 section.verse p {
@@ -226,10 +294,12 @@ div.popup {
 
 div.popup .content {
   position: relative;
-  transition-delay: 1s;
+  max-width: 200px;
+  width: 100%;
+  transition-delay: 0s;
   transform-property: transform, opacity;
   transition: .25s var(--cubic);
-  transform: translate3d(400px, 300px, 0) scale(0);
+  transform: scale(0);
   transform-origin: 50% 100%;
 }
 
@@ -266,9 +336,11 @@ div.popup .content.animating::after {
   animation-delay: -.4s;
 }
 
-div.popup .content p {
-  margin: 0;
+div.popup .content>div {
+  display: grid;
+  grid-gap: .5rem;
   font-size: var(--fontsm);
+  color: var(--black);
   padding: 10px;
   background: #fff;
   box-shadow: var(--boxshadow);
@@ -381,8 +453,8 @@ div.user.active {
   opacity: 1;
 }
 
-div.user span,
-div.user h3 {
+div.user h3,
+div.user span {
   font-size: var(--fontsm);
   font-weight: var(--regular);
   color: var(--black);
@@ -404,7 +476,9 @@ button.button {
   border: none;
   background: none; 
   padding: 0;
+  font-size: 0;
   cursor: pointer;
+
 }
 
 button.button:hover::before,
@@ -492,8 +566,8 @@ form.send-wave-form.show {
   opacity: 1;
 }
 
-div.popup .content div.carat,
-form.send-wave-form div.carat {
+div.popup .content .carat,
+form.send-wave-form .carat {
   position: absolute;
   bottom: -5px;
   left: 50%;
@@ -501,6 +575,17 @@ form.send-wave-form div.carat {
   height: 10px;
   width: 10px;
   background: #fff;
+}
+
+div.popup .content .name {
+  font-size: var(--fontsm); 
+  font-weight: var(--regular);
+}
+
+div.popup .content .location {
+  font-size: var(--fontsm);
+  font-weight: var(--bold);
+  color: var(--black); 
 }
 
 footer {

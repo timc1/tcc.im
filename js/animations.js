@@ -2,7 +2,7 @@
   /* Three.js globe inspired by Stripe.com/atlas project and https://codepen.io/Flamov/pen/MozgXb */
 
   // Cache DOM selector. Since we're working within our section.globe we
-  // can simply reference container.whatever instead of document.whatever!!
+  // can simply reference container.whatever instead of document.whatever
   const container = document.getElementsByClassName('globe')[0]
   const canvas = container.getElementsByTagName('canvas')[0]
   // Canvas width and height.
@@ -46,13 +46,15 @@
     },
     transition: {
       current: 0,
-      target: 50,
+      target: 30,
     },
   }
   // This keeps track of the values we'll use to animate in and out the globe popup.
   const popup = {
+    domElement: container.getElementsByClassName('content')[0],
     cacheVertices: null,
   }
+
   // User data
   const users = [
     {
@@ -60,6 +62,12 @@
       geo: { lat: 34.0522, lng: -118.2437, name: 'Los Angeles, CA' },
       date: '10.09.2018',
     },
+    {
+      name: 'Someone in SF',
+      geo: { lat: 37.7749, lng: -122.4194, name: 'San Francisco, CA' },
+      date: '10.09.2018',
+    },
+
     {
       name: 'Other Friend',
       geo: { lat: 40.7128, lng: -74.006, name: 'New York, NY' },
@@ -88,7 +96,7 @@
     previousUserIndex: null,
     isFormShowing: false,
     isGlobeAnimating: false,
-    currentPopupElement: null,
+    autoRotateGlobeTimer: null,
   }
 
   // Enter.
@@ -136,7 +144,7 @@
     // setupPivot will place our entire globe (the base mesh, points that make up the globe, userPoints)
     // all in one Three.Group. This way, we can rotate this one Group rather than the camera.
     // We can then use the camera to look at specific parts of the globe and not have to do much calculations.
-    setupPivot()
+    //setupPivot()
     setupOrbitControls()
     setupUsers()
     setupEventListeners()
@@ -188,7 +196,7 @@
     groups.globe = globe
     groups.globe.name = 'Globe'
 
-    //scene.add(groups.globe)
+    scene.add(groups.globe)
 
     addPoints()
     //addUserPoint()
@@ -221,7 +229,7 @@
     const total = new THREE.Mesh(mergedGeometry, material)
     groups.globePoints = total
     groups.globePoints.name = 'Globe Points'
-    //scene.add(groups.globePoints)
+    scene.add(groups.globePoints)
   }
 
   /*
@@ -243,6 +251,7 @@
   }
   */
 
+  /*
   function setupPivot() {
     pivot = new THREE.Group()
     scene.add(pivot)
@@ -250,6 +259,7 @@
     pivot.add(groups.globePoints)
     //pivot.add(groups.userPoints)
   }
+  */
 
   function setupOrbitControls() {
     camera.orbitControls = new THREE.OrbitControls(camera.object, canvas)
@@ -273,9 +283,8 @@
     users.forEach(user => {
       const markup = `
         <div class="user">
-          <h3 class="name">${user.name}</h3> 
+          <h3 class="name">${user.name}</h3>
           <span class="geo">${user.geo.lat}°, ${user.geo.lng}°</span>
-          <span class="geo-name">${user.geo.name}</span>
           <span class="date">${user.date}</span>
         </div>
       `
@@ -283,8 +292,11 @@
     })
     container.getElementsByClassName('users')[0].innerHTML = finishedMarkup
 
-    // 2.
     focusUser()
+    // Setup a timer to automatically toggle next user every (n)ms
+    state.autoRotateGlobeTimer = setInterval(() => {
+      focusUser()
+    }, 10000)
   }
 
   function focusUser() {
@@ -332,10 +344,12 @@
     camera.angles.target.polar = polar
 
     // Updating state here will make sure our animate method will rotate our globe to the next point.
-    // It will also make sure we update & cache our currentPopupElement so we can use it in our animateGlobeToNextLocation.
+    // It will also make sure we update & cache our popup DOM element so we can use it in our animateGlobeToNextLocation.
     state.isGlobeAnimating = true
-    state.currentPopupElement = container.getElementsByClassName('content')[0]
-    animatePopup('HIDE')
+
+    if (popup.cacheVertices) {
+      updatePopup('HIDE')
+    }
   }
 
   function setupEventListeners() {
@@ -347,11 +361,24 @@
         const classname = e.target.getAttribute('class')
         if (classname.indexOf('arrow-next') !== -1) {
           focusUser()
+          // Reset our autoRotateGlobeTimer
+          clearInterval(state.autoRotateGlobeTimer)
+          state.autoRotateGlobeTimer = setInterval(() => {
+            focusUser()
+          }, 10000)
         }
         if (classname.indexOf('send-wave') !== -1) {
           toggleForm()
         }
       }
+    })
+
+    // Setup event listener for form.
+    const form = container.getElementsByClassName('send-wave-form')[0]
+    form.addEventListener('submit', function(e) {
+      e.preventDefault()
+      const name = e.target.name.value
+      const message = e.target.message.value
     })
 
     // Setup event listeners for input/textarea focus/blur
@@ -373,12 +400,25 @@
       })
     })
 
-    // Setup event listener for form.
-    const form = container.getElementsByClassName('send-wave-form')[0]
-    form.addEventListener('submit', function(e) {
-      e.preventDefault()
-      const name = e.target.name.value
-      const message = e.target.message.value
+    // Setup event listeners for outer click.
+    document.addEventListener('click', function(e) {
+      // Manage outer click for our form.
+      if (state.isFormShowing) {
+        if (
+          form.contains(e.target) ||
+          e.target.classList.contains('send-wave')
+        ) {
+          // Do nothing.
+        } else {
+          toggleForm()
+        }
+      }
+    })
+    document.addEventListener('keydown', function(e) {
+      // Close form when user clicks escape.
+      if (e.keyCode === 27 && state.isFormShowing) {
+        toggleForm()
+      }
     })
   }
 
@@ -387,6 +427,7 @@
     const form = container.getElementsByClassName('send-wave-form')[0]
     const toggle = container.getElementsByClassName('send-wave')[0]
     const inputs = form.querySelectorAll('input,textarea')
+
     if (state.isFormShowing) {
       form.classList.add('show')
       toggle.classList.add('exit')
@@ -395,7 +436,10 @@
     } else {
       form.classList.remove('show')
       toggle.classList.remove('exit')
-      inputs.forEach(input => (input.tabIndex = -1))
+      inputs.forEach(input => {
+        input.tabIndex = -1
+        input.blur()
+      })
     }
   }
 
@@ -438,41 +482,51 @@
 
       camera.transition.current++
     } else {
+      updatePopup('SHOW')
       state.isGlobeAnimating = false
       camera.transition.current = 0
-      // Animate and display popup
-      animatePopup('SHOW')
     }
   }
 
-  function animatePopup(action) {
-    const el = state.currentPopupElement
-    let x, y, scale
-    if (action === 'SHOW') {
-      const user = users[state.currentUserIndex]
-      const coords = convertLatLngToSphereCoords(user.geo.lat, user.geo.lng)
+  function setupPopup() {
+    // Setup will only be called at the beginning in order to position our popup correctly
+    // on the screen so the first animation won't flow in from a crazy angle.
+    const { x, y } = calculatePopupLocation()
+    popup.cacheVertices = { x, y }
+    updatePopup('HIDE')
+    setTimeout(() => updatePopup('SHOW'), 250)
+  }
 
-      const projected = getProjectedPosition(
-        canvas.clientWidth / 2,
-        canvas.clientHeight / 2,
-        coords,
-        el.clientWidth,
-        el.clientHeight
-      )
-      x = projected.x
-      y = projected.y
+  function updatePopup(action) {
+    const user = users[state.currentUserIndex]
+    const { domElement: el, cacheVertices } = popup
+    if (!cacheVertices) {
+      setupPopup()
+      return
+    }
 
-      // Set popup.cacheVertices
-      popup.cacheVertices = { x, y }
-      scale = 1
-      el.classList.add('animating')
-    } else {
-      // Ignore initial load 'hide' since the popup element is already going to be hidden.
-      if (!popup.cacheVertices) return
-      x = popup.cacheVertices.x
-      y = popup.cacheVertices.y
-      scale = 0
-      el.classList.remove('animating')
+    let scale, x, y
+
+    switch (action) {
+      case 'SHOW':
+        const target = calculatePopupLocation()
+        x = target.x
+        y = target.y
+        popup.cacheVertices = { x, y }
+        el.classList.add('animating')
+        const contentContainer = el.getElementsByTagName('div')[0]
+        contentContainer.innerHTML = `
+          <span class="name">${user.name}</span>
+          <span class="location">${user.geo.name}</span>
+        `
+        scale = 1
+        break
+      case 'HIDE':
+        x = cacheVertices.x
+        y = cacheVertices.y
+        el.classList.remove('animating')
+        scale = 0
+        break
     }
 
     el.style.webkitTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
@@ -481,6 +535,21 @@
     el.style.msTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
     el.style.oTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
     el.style.transform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
+  }
+
+  function calculatePopupLocation() {
+    const { domElement: el } = popup
+    const user = users[state.currentUserIndex]
+    const coords = convertLatLngToSphereCoords(user.geo.lat, user.geo.lng)
+
+    const { x, y } = getProjectedPosition(
+      canvas.clientWidth / 2,
+      canvas.clientHeight / 2,
+      coords,
+      el.clientWidth,
+      el.clientHeight
+    )
+    return { x, y }
   }
 
   // Helpers

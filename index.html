@@ -24,8 +24,9 @@
             <canvas></canvas>
             <div class="popup">
               <div class="content">
-                <p>Some text here blhablh blah blah blah</p>
-                <div class="carat"></div>
+                <!-- Injected content here -->
+                <div></div>
+                <span class="carat"></span>
               </div>
             </div>
           </div>
@@ -36,11 +37,12 @@
             </div>
             <button 
               class="button arrow-next"
-              aria-label="Toggle to view another user's location on the globe."></button>
+              aria-label="Toggle to view another user's location on the globe.">View next user</button>
             <div class="send-wave-container">
               <button 
                 class="button send-wave"
-                aria-label="Toggle a form to submit your own location on the globe."></button>
+                aria-label="Toggle a form to submit your own location on the globe.">Send your location</button>
+              
               <form class="send-wave-form">
                 <div class="input-wrapper empty">
                   <label for="name">Your name</label>
@@ -65,6 +67,11 @@
                     tabindex="-1"
                     ></textarea>
                 </div>
+                <button class="submit-button">
+                  <div>
+                    Send location
+                  </div> 
+                </button>
                 <div class="carat" />
               </form>
             </div>
