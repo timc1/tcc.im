@@ -70,7 +70,7 @@ main {
   overflow: hidden;
 }
 
-a, button, input, select, textarea {
+a, button, input, select, textarea, label {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -171,6 +171,47 @@ input:-webkit-autofill {
 input::placeholder, textarea::placeholder {
   color: var(--lightgray);
   opacity: 0;
+}
+
+@keyframes spin1 {
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+div.loader {
+  position: relative;
+  height: 25px;
+  width: 25px;
+  background: none;
+  border: 2px solid var(--gray);
+  border-radius: 50%;
+}
+
+div.loader::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 2rem;
+  width: 1em;
+  background: #fff;
+  transform-origin: 50% 50%;
+  transform: translate(-50%, -50%) rotate(0);
+  animation: spin1 1s infinite var(--cubic);
+}
+
+div.loader::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 2rem;
+  width: .5em;
+  background: #fff;
+  transform-origin: 50% 50%;
+  transform: translate(-50%, -50%) rotate(0);
+  animation: spin1 1.5s infinite var(--cubic);
 }
 
 button.submit-button {
@@ -469,6 +510,15 @@ div.user span {
   overflow: hidden;
 }
 
+div.actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  grid-gap: .99rem;
+  justify-content: end;
+  align-items: center;
+}
+
 button.button {
   position: relative;
   align-self: stretch;
@@ -478,7 +528,6 @@ button.button {
   padding: 0;
   font-size: 0;
   cursor: pointer;
-
 }
 
 button.button:hover::before,

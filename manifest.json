@@ -1,0 +1,13 @@
+{
+  "name": "Tim Chang @tcc.im",
+  "short_name": "BuiltByTim",
+  "description": "A product developer building user interfaces, specializing in React.",
+  "start_url": "/",
+  "background_color": "#fff",
+  "theme_color": "#121123",
+  "icons": [{
+    "src": "icons/favicon.png",
+    "sizes": "75x75",
+    "type": "image/png"
+  }]
+}

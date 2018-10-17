@@ -1,115 +1,119 @@
 <!DOCTYPE html>
 <!-- What is life 🙄 -->
-  <html lang="en">
-    <head>
-      <meta charset="utf-8"/>
-      <meta http-equiv="x-ua-compatible" content="ie=edge"/>
-      <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
-      <title>Tim Chang | Product Developer | Los Angeles, CA</title>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
+    <title>Tim Chang | Product Developer | Los Angeles, CA</title>
 
-      <link rel="shortcut icon" href="icons/favicon.png"/>
-      <link rel="stylesheet" type="text/css" href="styles.css">
-    </head> 
-    <body>
-      <main>
-        <section class="verse">
-          <p>Life is good</p>
-          <p>when we do things that matter.</p>
-          <p>For ourselves, and for our communities.</p>
-          <p>Whether it is building tools to enable independent creators, marketplaces, cross-border commerce, or creating a compelling business and brand,</p>
-          <p>it is better to build it together.</p>
-        </section>
-        <section class="globe">
-          <div class="globe-content">
-            <canvas></canvas>
-            <div class="popup">
-              <div class="content">
-                <!-- Injected content here -->
-                <div></div>
-                <span class="carat"></span>
-              </div>
+    <link rel="shortcut icon" href="icons/favicon.png"/>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" type="text/css" href="styles.css">
+  </head> 
+  <body>
+    <main>
+      <section class="verse">
+        <p>Life is good</p>
+        <p>when we do things that matter.</p>
+        <p>For ourselves, and for our communities.</p>
+        <p>Whether it is building tools to enable independent creators, marketplaces, cross-border commerce, or creating a compelling business and brand,</p>
+        <p>it is better to build it together.</p>
+      </section>
+      <section class="globe">
+        <div class="globe-content">
+          <canvas></canvas>
+          <div class="popup">
+            <div class="content">
+              <!-- Injected content here -->
+              <div></div>
+              <span class="carat"></span>
             </div>
           </div>
-          <div class="people">
-            <div class="scroll-container">
-              <div class="users">
-              </div>
+        </div>
+        <div class="people">
+          <div class="scroll-container">
+            <div class="users">
             </div>
+          </div>
+          <button 
+                 class="button arrow-next"
+                 aria-label="Toggle to view another user's location on the globe.">View next user</button>
+          <div class="send-wave-container">
             <button 
-              class="button arrow-next"
-              aria-label="Toggle to view another user's location on the globe.">View next user</button>
-            <div class="send-wave-container">
-              <button 
-                class="button send-wave"
-                aria-label="Toggle a form to submit your own location on the globe.">Send your location</button>
-              
-              <form class="send-wave-form">
-                <div class="input-wrapper empty">
-                  <label for="name">Your name</label>
-                  <input 
-                     type="text"
-                     id="name" 
-                     autocomplete="off"
-                     spellcheck="off"
-                     placeholder="Kim Kardashian"
-                     tabindex="-1"
-                     required
-                     />  
-                </div>
-                <div class="input-wrapper empty">
-                  <label for="message">Add a message</label>
-                  <textarea
-                    type="text" 
-                    id="message"
-                    autocomplete="off"
-                    spellcheck="off"
-                    placeholder="Hello from 🇯🇵 🇦🇺 🇬🇧!"
-                    tabindex="-1"
-                    ></textarea>
-                </div>
+               class="button send-wave"
+               aria-label="Toggle a form to submit your own location on the globe.">Send your location</button>
+
+            <form class="send-wave-form">
+              <div class="input-wrapper empty">
+                <label for="name">Your name</label>
+                <input 
+                       type="text"
+                       id="name" 
+                       autocomplete="off"
+                       spellcheck="off"
+                       placeholder="Kim Kardashian"
+                       tabindex="-1"
+                       required
+                       />  
+              </div>
+              <div class="input-wrapper empty">
+                <label for="message">Add a message</label>
+                <textarea
+                  type="text" 
+                  id="message"
+                  autocomplete="off"
+                  spellcheck="off"
+                  placeholder="Hello from 🇯🇵 🇦🇺 🇬🇧!"
+                  tabindex="-1"
+                  ></textarea>
+              </div>
+              <div class="actions">
+                <div class="loader"></div>
                 <button class="submit-button">
                   <div>
                     Send location
                   </div> 
                 </button>
-                <div class="carat" />
-              </form>
-            </div>
+              </div>
+              <div class="carat" />
+            </form>
+              </div>
           </div>
 
-        </section>
-                       
-        <!--
+      </section>
+
+      <!--
         <section class="about">
-          <p>Hello, I'm Tim. Currently I'm an independent product developer based in Los Angeles.</p>
-          <p>I work toward building digital products that enable better offline, tangible, and human experiences.</p>
+        <p>Hello, I'm Tim. Currently I'm an independent product developer based in Los Angeles.</p>
+        <p>I work toward building digital products that enable better offline, tangible, and human experiences.</p>
         </section>
         <footer>
-          <h2 class="hidden">Social Media</h2>
-          <ul>
-            <li>
-              <a 
-                 href="https://instagram.com/timm.c/" 
-                 target="_blank" 
-                 rel="noreferrer">IG</a>
-            </li> 
-            <li>
-              <a 
-                 href="https://www.producthunt.com/@timothy_chang" 
-                 target="_blank" 
-                 rel="noreferrer">PH</a>
-            </li> 
-            <li>
-              <a href="mailto:timchang.tcc@gmail.com?subject=Hi Tim!">EMAIL</a>
-            </li>
-          </ul> 
+        <h2 class="hidden">Social Media</h2>
+        <ul>
+        <li>
+        <a 
+        href="https://instagram.com/timm.c/" 
+        target="_blank" 
+        rel="noreferrer">IG</a>
+        </li> 
+        <li>
+        <a 
+        href="https://www.producthunt.com/@timothy_chang" 
+        target="_blank" 
+        rel="noreferrer">PH</a>
+        </li> 
+        <li>
+        <a href="mailto:timchang.tcc@gmail.com?subject=Hi Tim!">EMAIL</a>
+        </li>
+        </ul> 
         </footer>
-        -->
-      </main>
+      -->
+    </main>
 
-      <script src="js/three.min.js"></script>
-      <script src="js/orbital-controls.js"></script>
-      <script src="js/animations.js" async></script>
-      <script src="js/index.js"></script>
-    </body>
-  </html>
+    <script src="js/three.min.js"></script>
+    <script src="js/orbital-controls.js"></script>
+    <script src="js/animations.js" async></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>

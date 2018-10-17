@@ -97,6 +97,7 @@
     isFormShowing: false,
     isGlobeAnimating: false,
     autoRotateGlobeTimer: null,
+    isSubmittingForm: false,
   }
 
   // Enter.
@@ -375,10 +376,22 @@
 
     // Setup event listener for form.
     const form = container.getElementsByClassName('send-wave-form')[0]
+    const loader = form.getElementsByClassName('loader')[0]
     form.addEventListener('submit', function(e) {
       e.preventDefault()
-      const name = e.target.name.value
-      const message = e.target.message.value
+      state.isSubmittingForm = true
+      toggleSpinner(loader)
+
+      window.navigator.geolocation.getCurrentPosition(onSuccess, onError)
+
+      function onSuccess(location) {
+        console.log('success', location)
+        const name = e.target.name.value
+        const message = e.target.message.value
+      }
+      function onError(error) {
+        console.log('error', error)
+      }
     })
 
     // Setup event listeners for input/textarea focus/blur
@@ -440,6 +453,13 @@
         input.tabIndex = -1
         input.blur()
       })
+    }
+  }
+
+  function toggleSpinner(el) {
+    if (state.isSubmittingForm) {
+      console.log('spin bruv')
+    } else {
     }
   }
 
