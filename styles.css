@@ -97,15 +97,14 @@ input, textarea {
   border: none;
   outline: none;
   font-size: var(--fontmd);
-  line-height: var(--fontmd);
+  line-height: var(--fontlg);
   text-overflow: ellipsis;
 }
 
 textarea {
   min-height: 62px;
   max-height: 150px;
-  min-width: 300px;
-  max-width: 400px;
+  resize: none;
 }
 
 input::placeholder, 
@@ -118,6 +117,7 @@ textarea::placeholder {
 
 div.input-wrapper {
   position: relative;
+  margin-bottom: 25px;
 }
 
 div.input-wrapper::after {
@@ -144,7 +144,7 @@ div.input-wrapper.active textarea::placeholder {
 }
 
 div.input-wrapper.empty label {
-  transform: translateY(14px);
+  transform: translateY(21px);
   cursor: text;
   opacity: .3;
 }
@@ -220,7 +220,7 @@ div.loader::after {
   position: absolute;
   height: inherit;
   width: inherit;
-  background: var(--purple);
+  background: var(--gray);
   -webkit-mask: url(/imgs/check.svg) center bottom / contain no-repeat;
   transition: transform .2s var(--cubicbounce);
   transform: scale(0);
@@ -369,8 +369,7 @@ div.popup {
 
 div.popup .content {
   position: relative;
-  max-width: 200px;
-  width: 100%;
+  width: 150px;
   transition-delay: 0s;
   transform-property: transform, opacity;
   transition: .25s var(--cubic);
@@ -449,7 +448,7 @@ div.popup .content>div {
   section.globe {
     margin-top: 0;
     max-width: 100vw;
-    margin-left: 20px;
+    padding-left: 20px;
   }
   div.globe-content {
     width: 1100px;
@@ -502,6 +501,18 @@ div.people::before {
   right: 0;
   height: 100px;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
+}
+
+@media(max-width: 767px) {
+  div.people {
+    justify-content: end;
+    grid-template-columns: var(--peoplegridmax) minmax(auto, 150px);
+    margin: 20px 40px 20px 20px;
+  }
+
+  div.send-wave-container {
+    grid-column: 2;
+  }
 }
 
 div.scroll-container {
@@ -560,6 +571,7 @@ button.button {
   border: none;
   background: none; 
   padding: 0;
+  min-height: 60px;
   font-size: 0;
   cursor: pointer;
 }
@@ -629,11 +641,9 @@ form.send-wave-form {
   position: absolute;
   left: 50%;
   bottom: 85px;
-  display: grid;
-  grid-gap: 25px;
   transform: translateX(-50%) scale(.5);
   border: none;
-  min-width: 300px;
+  width: 350px;
   padding: 35px 30px;
   background: #fff;
   box-shadow: var(--boxshadow);
@@ -647,6 +657,19 @@ form.send-wave-form.show {
   transform: translateX(-50%) scale(1);
   pointer-events: initial;
   opacity: 1;
+}
+
+@media(max-width: 1024px) {
+  form.send-wave-form {
+    min-width: unset;
+    width: 280px;
+  }
+  form.send-wave-form.show {
+    transform: translateX(-80%) scale(1);
+  }
+  form.send-wave-form .carat {
+    transform: translateX(800%) rotate(45deg) !important;
+  }
 }
 
 div.popup .content .carat,

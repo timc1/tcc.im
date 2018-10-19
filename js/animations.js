@@ -24,12 +24,13 @@
   /**
    * Three.js variables and properties we need to keep track of.
    *
-   * @property {Array} data
-   * @property {Object} scene
-   * @property {Object} renderer
-   * @property {Object} camera
-   * @property {Object} globe
-   * @property {Object} pivot
+   * @property {Array} data the points that make up our globe
+   * @property {Object} scene three.js scene
+   * @property {Object} renderer three.js renderer
+   * @property {Object} camera three.js camera
+   * @property {Object} globe the object that contains the elements that make up the globe
+   * @property {Object} pivot the object that holds all three.js materials into one mesh in order to more
+   *                    efficiently move the object (if we are not rotating via the camera)
    */
   let data, scene, renderer, globe, pivot
   const camera = {
@@ -112,7 +113,7 @@
     // setupPivot will place our entire globe (the base mesh, points that make up the globe, userPoints)
     // all in one Three.Group. This way, we can rotate this one Group rather than the camera.
     // We can then use the camera to look at specific parts of the globe and not have to do much calculations.
-    //setupPivot()
+    // setupPivot()
     setupOrbitControls()
     setupUsers()
     setupEventListeners()
@@ -202,6 +203,8 @@
 
   /*
   function addUserPoint() {
+    // This will create all of the user points onto the globe. But we are not using it right now because
+    // we want to render only one point at a time. 
     const mergedGeometry = new THREE.Geometry()
     const pingGeometry = new THREE.SphereGeometry(3, 3, 3)
     // The material that our ping will be created from.
@@ -240,94 +243,109 @@
     camera.orbitControls.update()
   }
 
-  async function setupUsers() {
+  /**
+   * This will manage rendering users into the DOM.
+   *
+   * @property {Object} user a single user object to append to the already existing DOM. Will not be called on initial rendering.
+   */
+  async function setupUsers(user) {
     // 1. Render all users onto page
     // 2. Selects a random user to scroll to.
     // 3. Rotate the globe to point to lat/lng.
     // 4. Setup click event listners for when client clicks next.
+    let finishedMarkup = ''
 
-    // We'll never error from this because our server
-    // will return a cached set of data if it fails.
+    const getMarkup = user =>
+      `
+        <h3 class="name">${user.name}</h3>
+        <span class="geo">${user.geo.lat
+          .toString()
+          .substr(0, 7)}°, ${user.geo.lng.toString().substr(0, 7)}°</span>
+        <span class="date">${user.date}</span>
+      `
+
+    if (user) {
+      finishedMarkup = getMarkup(user)
+      const node = document.createElement('div')
+      node.className = 'user'
+      node.innerHTML = getMarkup(user)
+      container.getElementsByClassName('users')[0].appendChild(node)
+      return
+    }
+
+    // We'll never get an error from this because our server
+    // will return a cached set of data if it fails fetching.
     const response = await fetch(`${apiUrl}v0/user/all`)
     const { users } = await response.json()
-    console.log('users', users)
 
     state.users = users
-    let finishedMarkup = ''
+
     state.users.forEach(user => {
-      const markup = `
-        <div class="user">
-          <h3 class="name">${user.name}</h3>
-          <span class="geo">${user.geo.lat
-            .toString()
-            .substr(0, 7)}°, ${user.geo.lng.toString().substr(0, 7)}°</span>
-          <span class="date">${user.date}</span>
-        </div>
-      `
-      finishedMarkup += markup
+      const markup = getMarkup(user)
+      finishedMarkup += `<div class="user">${markup}</div>`
     })
     container.getElementsByClassName('users')[0].innerHTML = finishedMarkup
 
-    focusUser()
-    // Setup a timer to automatically toggle next user every (n)ms
-    state.autoRotateGlobeTimer = setInterval(() => {
+    // We'll do a check here even though our DB will always return a list of users.
+    // Just for safety measures. 😃
+    if (state.users.length > 0) {
       focusUser()
-    }, 10000)
+      // Setup a timer to automatically toggle next user every (n)ms
+      state.autoRotateGlobeTimer = setInterval(() => {
+        focusUser()
+      }, 10000)
+    }
   }
-
   function focusUser() {
-    if (state.currentUserIndex === null) {
-      // If there is no current user (when our page first loads), we'll pick one randomly.
-      state.currentUserIndex = getRandomNumberBetween(0, state.users.length - 1)
-    } else {
-      // If we already have an index (page has already been loaded/user already clicked next), we'll continue the sequence.
-      state.previousUserIndex = state.currentUserIndex
-      state.currentUserIndex = (state.currentUserIndex + 1) % state.users.length
+    if (state.users.length > 0) {
+      if (state.currentUserIndex === null) {
+        // If there is no current user (when our page first loads), we'll pick one randomly.
+        state.currentUserIndex = getRandomNumberBetween(
+          0,
+          state.users.length - 1
+        )
+      } else {
+        // If we already have an index (page has already been loaded/user already clicked next), we'll continue the sequence.
+        state.previousUserIndex = state.currentUserIndex
+        state.currentUserIndex =
+          (state.currentUserIndex + 1) % state.users.length
+      }
+      // 150px is our set width amount. If you change it in the css file (div.users), change it here.
+      // 1. Get the new translateX amount by multiplying the index of the state.currentUserIndex by 150
+      // 2. Set the new translateX amount * -1 because we're reading from left to right.
+      // 4. Get element of state.previousUserIndex and remove its 'active' class.
+      // 5. Get the current child div.user through getting the div.user element using state.currentUserIndex.
+      // 6. Add 'active' class to div.user of state.currentUserIndex.
+      const translateX = state.currentUserIndex * 150
+      const el = container.getElementsByClassName('users')[0]
+      el.style = `transform: translateX(-${translateX}px)`
+      const children = el.getElementsByClassName('user')
+      if (state.previousUserIndex !== null && state.previousUserIndex !== -1) {
+        children[state.previousUserIndex].classList.remove('active')
+      }
+      children[state.currentUserIndex].classList.add('active')
+      focusGlobe()
     }
-    // 150px is our set width amount. If you change it in the css file (div.users), change it here.
-    // 1. Get the new translateX amount by multiplying the index of the state.currentUserIndex by 150
-    // 2. Set the new translateX amount * -1 because we're reading from left to right.
-    // 4. Get element of state.previousUserIndex and remove its 'active' class.
-    // 5. Get the current child div.user through getting the div.user element using state.currentUserIndex.
-    // 6. Add 'active' class to div.user of state.currentUserIndex.
-
-    const translateX = state.currentUserIndex * 150
-    const el = container.getElementsByClassName('users')[0]
-    el.style = `transform: translateX(-${translateX}px)`
-    const children = el.getElementsByClassName('user')
-    if (state.previousUserIndex !== null) {
-      children[state.previousUserIndex].classList.remove('active')
-    }
-    children[state.currentUserIndex].classList.add('active')
-
-    focusGlobe()
   }
-
   function focusGlobe() {
     // 1. We'll get the current user's lat/lng
     // 2. Set camera.angles.current
     // 3. Calculate and set camera.angles.target
     // 4. animate method will handle animating
-
     const { geo } = state.users[state.currentUserIndex]
     camera.angles.current.azimuthal = camera.orbitControls.getAzimuthalAngle()
     camera.angles.current.polar = camera.orbitControls.getPolarAngle()
-
     const { x, y } = convertLatLngToFlatCoords(geo.lat, geo.lng)
-
     const { azimuthal, polar } = returnCameraAngles(x, y)
     camera.angles.target.azimuthal = azimuthal
     camera.angles.target.polar = polar
-
     // Updating state here will make sure our animate method will rotate our globe to the next point.
     // It will also make sure we update & cache our popup DOM element so we can use it in our animateGlobeToNextLocation.
     state.isGlobeAnimating = true
-
     if (popup.cacheVertices) {
       updatePopup('HIDE')
     }
   }
-
   function setupEventListeners() {
     // Setup event listeners for toggling buttons.
     const buttons = container.querySelectorAll('button')
@@ -347,11 +365,9 @@
         }
       })
     })
-
     // Setup event listener for form.
     const form = container.getElementsByClassName('send-wave-form')[0]
     form.addEventListener('submit', submitForm)
-
     // Setup event listeners for input/textarea focus/blur
     const inputs = container.querySelectorAll('input,textarea')
     inputs.forEach(input => {
@@ -370,7 +386,6 @@
         e.target.parentNode.classList.remove('active')
       })
     })
-
     // Setup event listeners for outer click.
     document.addEventListener('click', function(e) {
       // Manage outer click for our form.
@@ -392,7 +407,6 @@
       }
     })
   }
-
   function submitForm(e) {
     e.preventDefault()
     const form = container.getElementsByClassName('send-wave-form')[0]
@@ -400,11 +414,8 @@
     const loader = form.getElementsByClassName('loader')[0]
     state.isSubmittingForm = true
     updateSpinner(loader, submitButton)
-
     window.navigator.geolocation.getCurrentPosition(onSuccess, onError)
-
     async function onSuccess(location) {
-      console.log('location', location)
       const name = e.target.name.value
       const message = e.target.message.value
       const {
@@ -436,7 +447,6 @@
               location_name = `${filtered.locality}, ${
                 filtered.administrative_area_level_1
               }`
-
               // Add user to database.
               const { error, user } = await httpPost(`${apiUrl}v0/user`, {
                 name,
@@ -445,25 +455,29 @@
                 longitude,
                 location_name,
               })
-
               state.isSubmittingForm = false
               if (error) {
-                state.isFormSubmissionSuccess = false
                 updateSpinner(loader, submitButton, false, true)
                 // Display error message
               } else {
-                state.isFormSubmissionSuccess = true
                 updateSpinner(loader, submitButton, true, false)
                 // Once we have a new user, we can push them onto our state.
                 // 1. Hide form after (n)ms.
                 // 2. Add user to state and gets it's position index in state.users array.
-                // 3. Update currentUserIndex to be that index so user will see themselves in the next iteration.
+                // 3. Add user to DOM.
+                // 4. Update currentUserIndex to be that index so user will see themselves in the next iteration.
                 setTimeout(() => {
                   toggleForm()
                   state.users.push(user)
-                }, 1000)
+                  // Append new user to DOM
+                  setupUsers(user)
+                  state.currentUserIndex =
+                    state.users.findIndex(u => u.id === user.id) - 1
+                  //Reset our autoRotateGlobeTimer
+                  clearInterval(state.autoRotateGlobeTimer)
+                  focusUser()
+                }, 800)
               }
-
               // Send an email to self 😊
               const { error: emailError, success } = await httpPost(
                 `${apiUrl}v0/email`,
@@ -490,7 +504,8 @@
       )
     }
     function onError(error) {
-      console.log('error', error)
+      state.isSubmittingForm = false
+      updateSpinner(loader, submitButton, false, true)
     }
   }
   function toggleForm() {
@@ -636,9 +651,8 @@
     return new THREE.Vector3(x, y, z)
   }
   function convertFlatCoordsToSphereCoords(x, y) {
-    //Calculate the relative 3d coordinates using Mercator projection relative to
-    //the radius of the globe.
-    // Convert latitude and longitude on the 90/180 degree axis
+    // Calculate the relative 3d coordinates using Mercator projection relative to the radius of the globe.
+    // Convert latitude and longitude on the 90/180 degree axis.
     let latitude = ((x - globeWidth) / globeWidth) * -180
     let longitude = ((y - globeHeight) / globeHeight) * -90
     latitude = (latitude * Math.PI) / 180 //(latitude / 180) * Math.PI
