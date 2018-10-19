@@ -15,8 +15,9 @@
   --bold: 800;
   --regular: 400;
   --basefont: univers,Open Sans,sans-serif;
+  --red: #f9683a;
   --lightpurple: #f3f1ff;
-  --purple: #bebbff;
+  --purple: #8b95ff;
   --lightgray: #626177;
   --gray: #38374b;
   --black: rgba(15,13,32,0.99);
@@ -179,13 +180,23 @@ input::placeholder, textarea::placeholder {
   }
 }
 
+@keyframes spinner {
+  0% {
+    transform: translate3d(-50%, -50%, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(-50%, -50%, 0) rotate(360deg);
+  }
+}
+
 div.loader {
   position: relative;
-  height: 25px;
-  width: 25px;
+  height: 15px;
+  width: 15px;
   background: none;
-  border: 2px solid var(--gray);
-  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0);
+  transition: .1s var(--cubic);
 }
 
 div.loader::before {
@@ -193,25 +204,48 @@ div.loader::before {
   position: absolute;
   top: 50%;
   left: 50%;
-  height: 2rem;
-  width: 1em;
-  background: #fff;
-  transform-origin: 50% 50%;
-  transform: translate(-50%, -50%) rotate(0);
-  animation: spin1 1s infinite var(--cubic);
+  height: inherit;
+  width: inherit;
+  border: 2px solid #fefefe;
+  border-bottom-color: var(--black);
+  border-radius: 50%;
+  opacity: inherit;
+  transform: translate3d(-50%, -50%, 0);
+  transform-origin: center;
+  animation: 1s cubic-bezier(0.54, 0.35, 0.74, 0.87) infinite spinner;
 }
 
 div.loader::after {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  height: 2rem;
-  width: .5em;
-  background: #fff;
-  transform-origin: 50% 50%;
-  transform: translate(-50%, -50%) rotate(0);
-  animation: spin1 1.5s infinite var(--cubic);
+  height: inherit;
+  width: inherit;
+  background: var(--purple);
+  -webkit-mask: url(/imgs/check.svg) center bottom / contain no-repeat;
+  transition: transform .2s var(--cubicbounce);
+  transform: scale(0);
+  opacity: 0;
+}
+
+div.loader.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+div.loader.show.success::before,
+div.loader.show.error::before {
+  opacity: 0;
+}
+
+div.loader.show.success::after,
+div.loader.show.error::after {
+  transform: scale(1.3); 
+  opacity: 1;
+}
+
+div.loader.show.error::after {
+  background: var(--red);
+  -webkit-mask: url(/imgs/error.svg) center bottom / contain no-repeat;
 }
 
 button.submit-button {
@@ -252,7 +286,7 @@ button.submit-button>div {
   text-transform: uppercase;
   color: var(--black);
   padding: 0.85rem;
-
+  z-index: -1;
 }
 
 button.submit-button>div::before {

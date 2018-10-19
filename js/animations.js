@@ -1,4 +1,5 @@
 ;(function() {
+  const apiUrl = 'http://localhost:3000/'
   /* Three.js globe inspired by Stripe.com/atlas project and https://codepen.io/Flamov/pen/MozgXb */
 
   // Cache DOM selector. Since we're working within our section.globe we
@@ -55,43 +56,9 @@
     cacheVertices: null,
   }
 
-  // User data
-  const users = [
-    {
-      name: 'Tim Chang',
-      geo: { lat: 34.0522, lng: -118.2437, name: 'Los Angeles, CA' },
-      date: '10.09.2018',
-    },
-    {
-      name: 'Someone in SF',
-      geo: { lat: 37.7749, lng: -122.4194, name: 'San Francisco, CA' },
-      date: '10.09.2018',
-    },
-
-    {
-      name: 'Other Friend',
-      geo: { lat: 40.7128, lng: -74.006, name: 'New York, NY' },
-      date: '10.29.2018',
-    },
-    {
-      name: 'More Friend',
-      geo: { lat: 39.913818, lng: 116.363625, name: 'Beijing, CH' },
-      date: '11.08.2018',
-    },
-    {
-      name: 'Tims Mom',
-      geo: { lat: 51.5074, lng: 0.1278, name: 'London, UK' },
-      date: '11.01.2018',
-    },
-    {
-      name: 'Test',
-      geo: { lat: 35.6895, lng: 139.6917, name: 'Tokyo, JP' },
-      date: '11.01.2018',
-    },
-  ]
-
   // A state object to hold visual state.
   const state = {
+    users: [],
     currentUserIndex: null,
     previousUserIndex: null,
     isFormShowing: false,
@@ -273,19 +240,27 @@
     camera.orbitControls.update()
   }
 
-  function setupUsers() {
+  async function setupUsers() {
     // 1. Render all users onto page
     // 2. Selects a random user to scroll to.
     // 3. Rotate the globe to point to lat/lng.
     // 4. Setup click event listners for when client clicks next.
 
-    // 1.
+    // We'll never error from this because our server
+    // will return a cached set of data if it fails.
+    const response = await fetch(`${apiUrl}v0/user/all`)
+    const { users } = await response.json()
+    console.log('users', users)
+
+    state.users = users
     let finishedMarkup = ''
-    users.forEach(user => {
+    state.users.forEach(user => {
       const markup = `
         <div class="user">
           <h3 class="name">${user.name}</h3>
-          <span class="geo">${user.geo.lat}°, ${user.geo.lng}°</span>
+          <span class="geo">${user.geo.lat
+            .toString()
+            .substr(0, 7)}°, ${user.geo.lng.toString().substr(0, 7)}°</span>
           <span class="date">${user.date}</span>
         </div>
       `
@@ -303,11 +278,11 @@
   function focusUser() {
     if (state.currentUserIndex === null) {
       // If there is no current user (when our page first loads), we'll pick one randomly.
-      state.currentUserIndex = getRandomNumberBetween(0, users.length - 1)
+      state.currentUserIndex = getRandomNumberBetween(0, state.users.length - 1)
     } else {
       // If we already have an index (page has already been loaded/user already clicked next), we'll continue the sequence.
       state.previousUserIndex = state.currentUserIndex
-      state.currentUserIndex = (state.currentUserIndex + 1) % users.length
+      state.currentUserIndex = (state.currentUserIndex + 1) % state.users.length
     }
     // 150px is our set width amount. If you change it in the css file (div.users), change it here.
     // 1. Get the new translateX amount by multiplying the index of the state.currentUserIndex by 150
@@ -334,7 +309,7 @@
     // 3. Calculate and set camera.angles.target
     // 4. animate method will handle animating
 
-    const { geo } = users[state.currentUserIndex]
+    const { geo } = state.users[state.currentUserIndex]
     camera.angles.current.azimuthal = camera.orbitControls.getAzimuthalAngle()
     camera.angles.current.polar = camera.orbitControls.getPolarAngle()
 
@@ -355,10 +330,9 @@
 
   function setupEventListeners() {
     // Setup event listeners for toggling buttons.
-    container.addEventListener('click', function(e) {
-      const isButton = e.target.tagName === 'BUTTON'
-      // Handles displaying the next user and locating them on the globe.
-      if (isButton) {
+    const buttons = container.querySelectorAll('button')
+    buttons.forEach(button => {
+      button.addEventListener('click', function(e) {
         const classname = e.target.getAttribute('class')
         if (classname.indexOf('arrow-next') !== -1) {
           focusUser()
@@ -371,28 +345,12 @@
         if (classname.indexOf('send-wave') !== -1) {
           toggleForm()
         }
-      }
+      })
     })
 
     // Setup event listener for form.
     const form = container.getElementsByClassName('send-wave-form')[0]
-    const loader = form.getElementsByClassName('loader')[0]
-    form.addEventListener('submit', function(e) {
-      e.preventDefault()
-      state.isSubmittingForm = true
-      toggleSpinner(loader)
-
-      window.navigator.geolocation.getCurrentPosition(onSuccess, onError)
-
-      function onSuccess(location) {
-        console.log('success', location)
-        const name = e.target.name.value
-        const message = e.target.message.value
-      }
-      function onError(error) {
-        console.log('error', error)
-      }
-    })
+    form.addEventListener('submit', submitForm)
 
     // Setup event listeners for input/textarea focus/blur
     const inputs = container.querySelectorAll('input,textarea')
@@ -435,12 +393,111 @@
     })
   }
 
+  function submitForm(e) {
+    e.preventDefault()
+    const form = container.getElementsByClassName('send-wave-form')[0]
+    const submitButton = form.getElementsByClassName('submit-button')[0]
+    const loader = form.getElementsByClassName('loader')[0]
+    state.isSubmittingForm = true
+    updateSpinner(loader, submitButton)
+
+    window.navigator.geolocation.getCurrentPosition(onSuccess, onError)
+
+    async function onSuccess(location) {
+      console.log('location', location)
+      const name = e.target.name.value
+      const message = e.target.message.value
+      const {
+        coords: { latitude, longitude },
+      } = location
+      let location_name
+      // Get name of location by using Google Maps API to reverse geocode latitude and longitude.
+      const geocoder = new google.maps.Geocoder()
+      geocoder.geocode(
+        {
+          location: {
+            lat: latitude,
+            lng: longitude,
+          },
+        },
+        async (results, status) => {
+          if (status === 'OK') {
+            if (results[0]) {
+              // We only want to extract the city and state/province.
+              const filtered = results[0].address_components.reduce(
+                (acc, curr) => {
+                  const type = curr.types[0]
+                  const short_name = curr.short_name
+                  acc[type] = short_name
+                  return acc
+                },
+                {}
+              )
+              location_name = `${filtered.locality}, ${
+                filtered.administrative_area_level_1
+              }`
+
+              // Add user to database.
+              const { error, user } = await httpPost(`${apiUrl}v0/user`, {
+                name,
+                message,
+                latitude,
+                longitude,
+                location_name,
+              })
+
+              state.isSubmittingForm = false
+              if (error) {
+                state.isFormSubmissionSuccess = false
+                updateSpinner(loader, submitButton, false, true)
+                // Display error message
+              } else {
+                state.isFormSubmissionSuccess = true
+                updateSpinner(loader, submitButton, true, false)
+                // Once we have a new user, we can push them onto our state.
+                // 1. Hide form after (n)ms.
+                // 2. Add user to state and gets it's position index in state.users array.
+                // 3. Update currentUserIndex to be that index so user will see themselves in the next iteration.
+                setTimeout(() => {
+                  toggleForm()
+                  state.users.push(user)
+                }, 1000)
+              }
+
+              // Send an email to self 😊
+              const { error: emailError, success } = await httpPost(
+                `${apiUrl}v0/email`,
+                {
+                  from: `New tcc.im visitor`,
+                  to: 'timchang.tcc@gmail.com',
+                  subject: `New Submission! <${name}>`,
+                  text: '',
+                  html: `
+                    <p>New submission from: ${name}</p>
+                    <p>Message: ${message}</p>
+                  `,
+                }
+              )
+            } else {
+              // Display error
+              updateSpinner(loader, submitButton, false, true)
+            }
+          } else {
+            // Display error
+            updateSpinner(loader, submitButton, false, true)
+          }
+        }
+      )
+    }
+    function onError(error) {
+      console.log('error', error)
+    }
+  }
   function toggleForm() {
     state.isFormShowing = !state.isFormShowing
     const form = container.getElementsByClassName('send-wave-form')[0]
     const toggle = container.getElementsByClassName('send-wave')[0]
     const inputs = form.querySelectorAll('input,textarea')
-
     if (state.isFormShowing) {
       form.classList.add('show')
       toggle.classList.add('exit')
@@ -455,20 +512,29 @@
       })
     }
   }
-
-  function toggleSpinner(el) {
+  function updateSpinner(spinner, toggler, isSuccess, isError) {
     if (state.isSubmittingForm) {
-      console.log('spin bruv')
+      spinner.classList.add('show')
+      toggler.disabled = true
+      return
+    } else if (isSuccess) {
+      spinner.classList.remove('error')
+      spinner.classList.add('success')
+      // We'll keep the toggler disabled so people don't double submit.
+    } else if (isError) {
+      spinner.classList.remove('success')
+      spinner.classList.add('error')
+      toggler.disabled = false
     } else {
+      spinner.classList.remove('show', 'error', 'success')
+      toggler.disabled = false
     }
   }
-
   function render() {
     renderer.render(scene, camera.object)
     requestAnimationFrame(render)
     animate()
   }
-
   function animate() {
     if (state.isGlobeAnimating) {
       // Here we update azimuthal and polar angles.
@@ -481,25 +547,20 @@
       camera.orbitControls.update()
     }
   }
-
   function animateGlobeToNextLocation() {
     const { current, target } = camera.transition
     if (current <= target) {
       const progress = easeInOutQuad(current / target)
-
       const {
         current: { azimuthal: currentAzimuthal, polar: currentPolar },
         target: { azimuthal: targetAzimuthal, polar: targetPolar },
       } = camera.angles
-
       var azimuthalDifference = (currentAzimuthal - targetAzimuthal) * progress
       azimuthalDifference = currentAzimuthal - azimuthalDifference
       camera.orbitControls.setAzimuthalAngle(azimuthalDifference)
-
       var polarDifference = (currentPolar - targetPolar) * progress
       polarDifference = currentPolar - polarDifference
       camera.orbitControls.setPolarAngle(polarDifference)
-
       camera.transition.current++
     } else {
       updatePopup('SHOW')
@@ -507,7 +568,6 @@
       camera.transition.current = 0
     }
   }
-
   function setupPopup() {
     // Setup will only be called at the beginning in order to position our popup correctly
     // on the screen so the first animation won't flow in from a crazy angle.
@@ -516,17 +576,14 @@
     updatePopup('HIDE')
     setTimeout(() => updatePopup('SHOW'), 250)
   }
-
   function updatePopup(action) {
-    const user = users[state.currentUserIndex]
+    const user = state.users[state.currentUserIndex]
     const { domElement: el, cacheVertices } = popup
     if (!cacheVertices) {
       setupPopup()
       return
     }
-
     let scale, x, y
-
     switch (action) {
       case 'SHOW':
         const target = calculatePopupLocation()
@@ -548,7 +605,6 @@
         scale = 0
         break
     }
-
     el.style.webkitTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
     el.style.WebkitTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
     el.style.mozTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
@@ -556,12 +612,10 @@
     el.style.oTransform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
     el.style.transform = `translate3D(${x}px, ${y}px, 0) scale(${scale})`
   }
-
   function calculatePopupLocation() {
     const { domElement: el } = popup
-    const user = users[state.currentUserIndex]
+    const user = state.users[state.currentUserIndex]
     const coords = convertLatLngToSphereCoords(user.geo.lat, user.geo.lng)
-
     const { x, y } = getProjectedPosition(
       canvas.clientWidth / 2,
       canvas.clientHeight / 2,
@@ -571,10 +625,8 @@
     )
     return { x, y }
   }
-
   // Helpers
   // =======
-
   function convertLatLngToSphereCoords(latitude, longitude) {
     const phi = (latitude * Math.PI) / 180
     const theta = ((longitude - 180) * Math.PI) / 180
@@ -583,38 +635,31 @@
     const z = (globeRadius + -1) * Math.cos(phi) * Math.sin(theta)
     return new THREE.Vector3(x, y, z)
   }
-
   function convertFlatCoordsToSphereCoords(x, y) {
     //Calculate the relative 3d coordinates using Mercator projection relative to
     //the radius of the globe.
-
     // Convert latitude and longitude on the 90/180 degree axis
     let latitude = ((x - globeWidth) / globeWidth) * -180
     let longitude = ((y - globeHeight) / globeHeight) * -90
-
     latitude = (latitude * Math.PI) / 180 //(latitude / 180) * Math.PI
     longitude = (longitude * Math.PI) / 180 //(longitude / 180) * Math.PI
-
     // Calculate the projected starting point
     const radius = Math.cos(longitude) * globeRadius
     const targetX = Math.cos(latitude) * radius
     const targetY = Math.sin(longitude) * globeRadius
     const targetZ = Math.sin(latitude) * radius
-
     return {
       x: targetX,
       y: targetY,
       z: targetZ,
     }
   }
-
   function convertLatLngToFlatCoords(latitude, longitude) {
     // Reference: https://stackoverflow.com/questions/7019101/convert-pixel-location-to-latitude-longitude-vise-versa
     const x = Math.round((longitude + 180) * (globeWidth / 360)) * 2
     const y = Math.round((-1 * latitude + 90) * (globeHeight / 180)) * 2
     return { x, y }
   }
-
   // Returns a 2d position based off of the canvas width and height to position popups on the globe.
   function getProjectedPosition(
     width,
@@ -625,13 +670,11 @@
   ) {
     position = position.clone()
     var projected = position.project(camera.object)
-
     return {
       x: projected.x * width + width - contentWidth / 2,
       y: -(projected.y * height) + height - contentHeight - 10, // -10 for a small offset
     }
   }
-
   // Returns an object of the azimuthal and polar angles of a given a points x,y coord on the globe
   function returnCameraAngles(x, y) {
     let targetAzimuthalAngle = ((x - globeWidth) / globeWidth) * Math.PI
@@ -644,15 +687,12 @@
       polar: targetPolarAngle,
     }
   }
-
   function easeInOutQuad(t) {
     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
   }
-
   function getRandomNumberBetween(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
-
   function checkWebGl() {
     const gl =
       canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
@@ -662,9 +702,24 @@
       return false
     }
   }
-
   function fallback() {
     container.innerHTML =
       'Your browser does not support this part of the page! 😭 Use another browser to experience it!'
+  }
+  function httpPost(url = ``, data = {}) {
+    // Default options are marked with *
+    return fetch(url, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, cors, *same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      //credentials: 'same-origin', // include, same-origin, *omit
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        // "Content-Type": "application/x-www-form-urlencoded",
+      },
+      redirect: 'follow', // manual, *follow, error
+      referrer: 'no-referrer', // no-referrer, *client
+      body: JSON.stringify(data), // body data type must match "Content-Type" header
+    }).then(response => response.json()) // parses response to JSON
   }
 })()
