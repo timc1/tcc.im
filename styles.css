@@ -1,12 +1,26 @@
+/*
 @font-face {
-  font-family: 'univers';
-  src: url('./fonts/univers.ttf');
+font-family: 'univers';
+src: url('./fonts/univers.ttf');
+font-weight: 100 500;
+font-style: normal;
+}
+@font-face {
+font-family: 'univers';
+src: url('./fonts/univers-bold.ttf');
+font-weight: 600 900;
+font-style: normal;
+}
+ */
+@font-face {
+  font-family: 'akkurat';
+  src: url('./fonts/akkurat-regular.ttf');
   font-weight: 100 500;
   font-style: normal;
 }
 @font-face {
-  font-family: 'univers';
-  src: url('./fonts/univers-bold.ttf');
+  font-family: 'akkurat';
+  src: url('./fonts/akkurat-bold.ttf');
   font-weight: 600 900;
   font-style: normal;
 }
@@ -14,15 +28,16 @@
 :root {
   --bold: 800;
   --regular: 400;
-  --basefont: univers,Open Sans,sans-serif;
+  --basefont: akkurat,Open Sans,sans-serif;
   --red: #f9683a;
   --lightpurple: #f3f1ff;
   --purple: #8b95ff;
+  --superlightgray: #f3f1ff;
   --lightgray: #626177;
   --gray: #38374b;
   --black: rgba(15,13,32,0.99);
   --fontlg: 2.2rem;
-  --fontmd: 1.2rem;
+  --fontmd: 1.1rem;
   --fontsm: .8rem;
 
   --peoplegridmax: 150px;
@@ -56,16 +71,24 @@ html {
   background: #fff;
 }
 
+.hidden {
+  height: 0;
+  visibility: hidden;
+  display: none;
+  opacity: 0;
+  z-index: -5;
+  pointer-events: none;
+}
+
 body {
   margin: 0;
   padding: 0;
 }
 
-main {
+header, main, footer {
   position: relative;
   max-width: 1600px;
   margin: auto;
-  height: 100%;
   padding: 0;
   box-sizing: border-box;
   overflow: hidden;
@@ -91,13 +114,13 @@ li {
 input, textarea {
   position: relative;
   width: 100%;
-  padding: 15px 0 5px 0;
+  padding: 10px 0 5px 0;
   color: var(--black);
   background-color: transparent;
   border: none;
   outline: none;
   font-size: var(--fontmd);
-  line-height: var(--fontlg);
+  line-height: 2.2rem;
   text-overflow: ellipsis;
 }
 
@@ -126,7 +149,7 @@ div.input-wrapper::after {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 1px;
+  height: 2px;
   background: var(--black);
   transition: transform .25s var(--cubic);
   transform-origin: 0 0;
@@ -144,7 +167,7 @@ div.input-wrapper.active textarea::placeholder {
 }
 
 div.input-wrapper.empty label {
-  transform: translateY(21px);
+  transform: translateY(17px);
   cursor: text;
   opacity: .3;
 }
@@ -158,7 +181,7 @@ label {
   opacity: 1;
   width: 100%;
   transform-origin: 0 0;
-  transform: translateY(-8px) scale(.65);
+  transform: translateY(-8px) scale(.75);
   transition-property: opacity, transform;
   transition: .25s var(--cubic);
   cursor: default;
@@ -313,7 +336,7 @@ button.submit-button>div::after {
   transition: opacity .25s var(--cubic);
 }
 
-section.verse, section.about, footer {
+section.verse, section.about, footer div.footer-content {
   margin-left: 8%;
 }
 
@@ -321,7 +344,6 @@ section.verse {
   margin-top: 8%;
   max-width: 500px;
   z-index: 1;
-  opacity: .1;
 }
 
 section.verse p {
@@ -344,7 +366,6 @@ section.about p {
 section.globe {
   position: relative; 
   width: 900px; 
-  margin-bottom: 200px; 
   margin-top: -40%;
   margin-left: auto;
   opacity: 0;
@@ -440,7 +461,7 @@ div.popup .content>div {
   section.verse {
     margin-top: 80px;
   }
-  section.verse, section.about, footer {
+  section.verse, section.about, footer div.footer-content {
     margin-left: 100px;
   }
 }
@@ -454,10 +475,11 @@ div.popup .content>div {
     width: 1100px;
     max-height: 500px;
   }
-  section.verse, section.about, footer {
+  section.verse, section.about, footer div.footer-content {
     margin-left: 40px;
     margin-right: 40px;
   }
+
   :root {
     --fontlg: 5vw;
   }
@@ -489,7 +511,7 @@ div.people {
   margin: 20px; 
   display: grid;
   grid-template-columns: var(--peoplegridmax) 80px 80px;
-  grid-gap: 20px;
+  grid-gap: 10px;
   align-items: center;
 }
 
@@ -578,12 +600,11 @@ button.button {
 
 button.button:hover::before,
 button.button:focus::before {
-  opacity: 1;
   transform: scale(1);
 }
 
 button.button:active::before {
-  transform: scale(.95);
+  transform: scale(.97);
 }
 
 
@@ -596,10 +617,8 @@ button.button::before {
   bottom: 0;
   background: #fff;
   border: 1px solid var(--lightgray);
-  transition-property: opacity, transform;
-  transition: .2s var(--cubic);
-  opacity: .4;
-  transform: scale(.98);
+  transition: transform .15s var(--cubic);
+  transform: scale(.96);
 }
 
 button.button::after {
@@ -640,7 +659,7 @@ div.send-wave-container {
 form.send-wave-form {
   position: absolute;
   left: 50%;
-  bottom: 85px;
+  bottom: 70px;
   transform: translateX(-50%) scale(.5);
   border: none;
   width: 350px;
@@ -694,48 +713,98 @@ div.popup .content .location {
   color: var(--black); 
 }
 
-footer {
-  margin-bottom: 150px;
+footer div.footer-content {
+  display: grid;
+  grid-template-columns: 381px max-content;
+  grid-gap: 1rem;
   max-width: 500px;
-  width: 100%;
+  margin-bottom: 40px;
+  opacity: 0;
+  transition: opacity .25s var(--cubic);
 }
-h2.hidden {
+
+footer div.footer-content.show {
+  opacity: 1;
+}
+
+@media(max-width: 767px) {
+  footer div.footer-content {
+    grid-template-columns: 1fr;
+    margin-top: 40px;
+  }
+
+  footer div.footer-content p {
+    font-size: var(--fontsm);
+  }
+  footer div.footer-content p:nth-child(3),
+  footer div.footer-content p:nth-child(4),
+  footer ul.social  {
+    grid-row: initial !important;
+  }
+}
+
+footer p {
+  margin: 0;
+  font-size: var(--fontmd);
+  color: var(--black);
+}
+
+footer div.footer-content p:nth-child(3) {
+  grid-row: 2;
+}
+footer div.footer-content p:nth-child(4) {
+  grid-row: 3;
+}
+
+footer h1.title {
+  font-size: 0;
+  visibility: hidden;
+  opacity: 0; 
+  pointer-events: none;
   display: none;
 }
-footer ul {
-  margin: 0;
-  padding: 0;
-  display: -ms-grid;
-  display: grid;
-  grid-gap: 0.99rem;
-  grid-auto-flow: column;
-  grid-auto-columns: -webkit-max-content;
-  grid-auto-columns: max-content;
-}
-footer li {
-  list-style: none;
-}
-footer a {
+
+footer a.hover {
   position: relative;
-  text-decoration: none;
-  color: var(--gray); 
-  font-weight: var(--regular);
   cursor: ne-resize;
-  transition: opacity .2s;
+  color: inherit;
+  transition: opacity .15s var(--cubic);
+  opacity: .8;
 }
-footer a::after {
+
+footer a.hover::before,
+footer a.hover::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -1px;
   left: 0;
   right: 0;
-  border-top: 1px solid var(--black)
+  height: 2px;
 }
-footer a:hover {
-  opacity: 0.5;
+
+footer a.hover::before {
+  background: var(--superlightgray);
 }
-footer li:not(:last-child)::after {
-  content: "·";
-  margin-left: 0.8rem;
+
+footer a.hover::after {
+  background: var(--black);
+  transition: transform .15s var(--cubic);
+  transform-origin: 0;
+  transform: scaleX(0);
+}
+
+footer a.hover:hover, 
+footer a.hover:active,
+footer a.hover:hover::after {
+  opacity: 1;
+  transform: scaleX(1); 
+}
+
+footer ul.social {
+  grid-row: 3;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  grid-gap: 1rem;
 }
 

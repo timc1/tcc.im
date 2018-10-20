@@ -119,7 +119,10 @@
     setupEventListeners()
     render()
 
-    setTimeout(() => container.classList.add('show'), 1)
+    setTimeout(() => {
+      container.classList.add('show')
+      document.getElementsByClassName('footer-content')[0].classList.add('show')
+    }, 1)
   }
 
   function setupGlobe() {
@@ -257,7 +260,7 @@
 
     const getMarkup = user =>
       `
-        <h3 class="name">${user.name}</h3>
+        <h3 class="name">${user.name.toUpperCase()}</h3>
         <span class="geo">${user.geo.lat
           .toString()
           .substr(0, 7)}°, ${user.geo.lng.toString().substr(0, 7)}°</span>
@@ -476,6 +479,9 @@
                   //Reset our autoRotateGlobeTimer
                   clearInterval(state.autoRotateGlobeTimer)
                   focusUser()
+                  state.autoRotateGlobeTimer = setInterval(() => {
+                    focusUser()
+                  }, 10000)
                 }, 800)
               }
               // Send an email to self 😊
@@ -608,7 +614,7 @@
         el.classList.add('animating')
         const contentContainer = el.getElementsByTagName('div')[0]
         contentContainer.innerHTML = `
-          <span class="name">${user.name}</span>
+          <span class="name">${user.name.toUpperCase()}</span>
           <span class="location">${user.geo.name}</span>
         `
         scale = 1

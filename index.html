@@ -5,13 +5,23 @@
     <meta charset="utf-8"/>
     <meta http-equiv="x-ua-compatible" content="ie=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
-    <title>Tim Chang | Product Developer | Los Angeles, CA</title>
+    <title>Tim Chang - Product Developer in Los Angeles</title>
 
     <link rel="shortcut icon" href="icons/favicon.png"/>
     <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" type="text/css" href="styles.css">
   </head> 
   <body>
+    <header>
+      <nav>
+        <h1 class="hidden">Tim Chang - Product Developer in Los Angeles</h1>
+        <ul class="hidden">
+          <li><a  href="https://instagram.com/timm.c/" target="_blank" rel="noreferrer">Instagram</a></li> 
+          <li><a href="https://www.producthunt.com/@timothy_chang" target="_blank" rel="noreferrer">Product Hunt</a></li> 
+          <li><a href="mailto:timchang.tcc@gmail.com?subject=Hi Tim!">Contact</a></li>
+        </ul> 
+      </nav>  
+    </header>
     <main>
       <section class="verse">
         <p>Life is good</p>
@@ -36,26 +46,14 @@
             <div class="users">
             </div>
           </div>
-          <button 
-                 class="button arrow-next"
-                 aria-label="Toggle to view another user's location on the globe.">View next user</button>
+          <button class="button arrow-next" aria-label="Toggle to view another user's location on the globe.">View next user</button>
           <div class="send-wave-container">
-            <button 
-               class="button send-wave"
-               aria-label="Toggle a form to submit your own location on the globe.">Send your location</button>
+            <button class="button send-wave" aria-label="Toggle a form to submit your own location on the globe.">Send your location</button>
 
             <form class="send-wave-form">
               <div class="input-wrapper empty">
                 <label for="name">Your name</label>
-                <input 
-                  type="text"
-                  id="name" 
-                  autocomplete="off"
-                  spellcheck="off"
-                  placeholder="Kim Kardashian"
-                  tabindex="-1"
-                  required
-                 />  
+                <input type="text" id="name" autocomplete="off" spellcheck="off" placeholder="Kim Kardashian" tabindex="-1" required/>  
               </div>
               <div class="input-wrapper empty">
                 <label for="message">Add a message</label>
@@ -76,40 +74,37 @@
                   </div> 
                 </button>
               </div>
-              <div class="carat" />
+              <div class="carat"></div>
             </form>
-              </div>
           </div>
-
+        </div>
       </section>
-
-      <!--
-        <section class="about">
-        <p>Hello, I'm Tim. Currently I'm an independent product developer based in Los Angeles.</p>
-        <p>I work toward building digital products that enable better offline, tangible, and human experiences.</p>
-        </section>
-        <footer>
-        <h2 class="hidden">Social Media</h2>
-        <ul>
-        <li>
-        <a 
-        href="https://instagram.com/timm.c/" 
-        target="_blank" 
-        rel="noreferrer">IG</a>
-        </li> 
-        <li>
-        <a 
-        href="https://www.producthunt.com/@timothy_chang" 
-        target="_blank" 
-        rel="noreferrer">PH</a>
-        </li> 
-        <li>
-        <a href="mailto:timchang.tcc@gmail.com?subject=Hi Tim!">EMAIL</a>
-        </li>
-        </ul> 
-        </footer>
-      -->
     </main>
+    <footer>
+      <div class="footer-content">
+        <h1 class="title">About</h1>
+        <p>I am a digital product developer building 
+        <span>accessible</span>, 
+        <span>performant</span>, and 
+        <span>interactive</span> user interfaces.
+        </p>
+
+        <p>Previously I've worked with 
+        <a class="hover" href="https://www.verlocal.com" target="_blank" rel="noreferrer">verlocal</a>, 
+        <a class="hover" href="https://www.omnyfy.com" target="_blank" rel="noreferrer">omnyfy</a>, and 
+        <a class="hover" href="https://www.handpick.com" target="_blank" rel="noreferrer">handpick</a> in 
+        <span>San Francisco</span> and <span>Shanghai</span>, and side ventures with
+        <a class="hover" href="https://avresources.co" target="_blank" rel="noreferrer">avrc</a>, 
+        <a class="hover" href="https://austillery.com" target="_blank" rel="noreferrer">austillery</a>, and 
+        <a class="hover" href="https://producthunt.com/@timothy_chang" target="_blank" rel="noreferrer">others</a>
+        </p>
+        <p>Currently working & living in <span>Los Angeles, CA</span></p>
+        <ul class="social">
+          <li><a class="hover" href="https://instagram.com/timm.c" target="_blank" rel="noreferrer">IG</a></li>
+          <li><a class="hover" href="mailto:timchang.tcc@gmail.com?subject=Hello!">EMAIL</a></li>
+        </ul>
+      </div>
+    </footer>
 
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABn_tA-AxJojWEce92zqSX5Qhh1Q3k2nc">
     </script>
