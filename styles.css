@@ -111,7 +111,12 @@ li {
   list-style: none;
 }
 
-input, textarea {
+input[type="text"],
+input[type="button"],
+input[type="submit"],
+textarea {
+  -webkit-appearance: none;
+  border-radius: 0;
   position: relative;
   width: 100%;
   padding: 10px 0 5px 0;
@@ -122,6 +127,7 @@ input, textarea {
   font-size: var(--fontmd);
   line-height: 2.2rem;
   text-overflow: ellipsis;
+  -webkit-appearance: none;
 }
 
 textarea {
@@ -181,7 +187,7 @@ label {
   opacity: 1;
   width: 100%;
   transform-origin: 0 0;
-  transform: translateY(-8px) scale(.75);
+  transform: translateY(-3px) scale(.75);
   transition-property: opacity, transform;
   transition: .25s var(--cubic);
   cursor: default;
@@ -344,6 +350,12 @@ section.verse {
   margin-top: 8%;
   max-width: 500px;
   z-index: 1;
+  opacity: 0;
+  transition: opacity .25s var(--cubic);
+}
+
+section.verse.show {
+  opacity: 1;
 }
 
 section.verse p {
@@ -366,7 +378,7 @@ section.about p {
 section.globe {
   position: relative; 
   width: 900px; 
-  margin-top: -40%;
+  margin-top: -29%;
   margin-left: auto;
   opacity: 0;
   transition: opacity 1s var(--cubic);
@@ -598,9 +610,11 @@ button.button {
   cursor: pointer;
 }
 
-button.button:hover::before,
-button.button:focus::before {
-  transform: scale(1);
+@media(min-width: 766px) {
+  button.button:hover::before,
+  button.button:focus::before {
+    transform: scale(1.03);
+  }
 }
 
 button.button:active::before {
@@ -617,8 +631,8 @@ button.button::before {
   bottom: 0;
   background: #fff;
   border: 1px solid var(--lightgray);
-  transition: transform .15s var(--cubic);
-  transform: scale(.96);
+  transition: transform .2s var(--cubic);
+  transform: scale(1);
 }
 
 button.button::after {
@@ -756,46 +770,44 @@ footer div.footer-content p:nth-child(4) {
   grid-row: 3;
 }
 
-footer h1.title {
-  font-size: 0;
-  visibility: hidden;
-  opacity: 0; 
-  pointer-events: none;
-  display: none;
-}
-
-footer a.hover {
+a.hover {
   position: relative;
   cursor: ne-resize;
   color: inherit;
   transition: opacity .15s var(--cubic);
   opacity: .8;
+  outline: none;
 }
 
-footer a.hover::before,
-footer a.hover::after {
+a.hover::before,
+a.hover::after {
   content: '';
   position: absolute;
   bottom: -1px;
   left: 0;
   right: 0;
   height: 2px;
+  border-top: 2px solid transparent;
 }
 
-footer a.hover::before {
+a.hover::before {
   background: var(--superlightgray);
+  border-top: 2px solid #fefefe;
 }
 
-footer a.hover::after {
+a.hover::after {
   background: var(--black);
+  border-top: 2px solid #fff;
   transition: transform .15s var(--cubic);
   transform-origin: 0;
   transform: scaleX(0);
 }
 
-footer a.hover:hover, 
-footer a.hover:active,
-footer a.hover:hover::after {
+a.hover:hover, 
+a.hover:active,
+a.hover:hover::after,
+a.hover:active::after,
+a.hover:focus::after {
   opacity: 1;
   transform: scaleX(1); 
 }
@@ -806,5 +818,16 @@ footer ul.social {
   grid-auto-flow: column;
   grid-auto-columns: max-content;
   grid-gap: 1rem;
+  align-items: end;
 }
 
+nav ul.language-selectors {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: end;
+  grid-gap: 1rem;
+  margin-top: var(--fontlg);
+  margin-right: 8%;
+}

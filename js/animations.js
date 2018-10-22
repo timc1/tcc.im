@@ -521,16 +521,20 @@
     const inputs = form.querySelectorAll('input,textarea')
     if (state.isFormShowing) {
       form.classList.add('show')
+      form.setAttribute('aria-expanded', true)
       toggle.classList.add('exit')
       inputs[0].focus()
       inputs.forEach(input => (input.tabIndex = 0))
+      form.getElementsByClassName('submit-button')[0].tabIndex = 0
     } else {
       form.classList.remove('show')
+      form.setAttribute('aria-expanded', false)
       toggle.classList.remove('exit')
       inputs.forEach(input => {
         input.tabIndex = -1
         input.blur()
       })
+      form.getElementsByClassName('submit-button')[0].tabIndex = -1
     }
   }
   function updateSpinner(spinner, toggler, isSuccess, isError) {
