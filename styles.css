@@ -30,7 +30,7 @@ font-style: normal;
   --regular: 400;
   --basefont: akkurat,Open Sans,sans-serif;
   --red: #f9683a;
-  --lightpurple: #f3f1ff;
+  --lightpurple: #efeef7;
   --purple: #8b95ff;
   --superlightgray: #f3f1ff;
   --lightgray: #626177;
@@ -779,25 +779,29 @@ a.hover {
   outline: none;
 }
 
+a.hover.cursor-default {
+  cursor: pointer;
+}
+
 a.hover::before,
 a.hover::after {
   content: '';
   position: absolute;
-  bottom: -1px;
+  bottom: 0;
   left: 0;
   right: 0;
   height: 2px;
-  border-top: 2px solid transparent;
+  border-top: 4px solid transparent;
+  z-index: -1;
 }
 
 a.hover::before {
-  background: var(--superlightgray);
-  border-top: 2px solid #fefefe;
+  background: var(--lightpurple);
 }
 
 a.hover::after {
   background: var(--black);
-  border-top: 2px solid #fff;
+  border-top: 4px solid #fff;
   transition: transform .15s var(--cubic);
   transform-origin: 0;
   transform: scaleX(0);

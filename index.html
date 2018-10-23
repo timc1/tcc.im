@@ -24,10 +24,10 @@
         <h2 class="hidden">Translate this website</h2>
         <ul class="language-selectors">
           <li>
-            <a href="?lang=en" class="hover">EN</a>
+            <a href="?lang=en" class="hover cursor-default">EN</a>
           </li> 
           <li>
-            <a href="?lang=zh" class="hover">中文</a>
+            <a href="?lang=zh" class="hover cursor-default">中文</a>
           </li> 
         </ul>
       </nav>  
@@ -118,6 +118,20 @@
     <script src="js/orbital-controls.js"></script>
     <script src="js/animations.js" async></script>
     <script src="js/index.js"></script>
+    <script>
+      // Setup service worker 
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').then(function(registration) {
+            // Registration was successful
+            console.log('Hello service worker! 🤖');
+          }, function(err) {
+            // registration failed :(
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
     <script>
       // Fixes mobile :active pseudo class not working.
       // Reference: https://stackoverflow.com/questions/3885018/active-pseudo-class-doesnt-work-in-mobile-safari
