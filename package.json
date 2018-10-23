@@ -4,7 +4,7 @@
   "description": "Personal site with Three.js/WebGL! 🍦 (https://tcc.im/)",
   "main": "sw.js",
   "scripts": {
-    "deploy": "aws s3 cp ~/desktop/projects/tcc.im/ s3://tcc.im/ --recursive",
+    "deploy": "aws s3 cp ~/desktop/projects/tcc.im/ s3://tcc.im/ --recursive --exclude '.git/*' --exclude '.gitignore' --exclude '.DS_Store' --exclude '*.md' --exclude '*.swp'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
