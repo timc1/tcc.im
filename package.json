@@ -1,0 +1,21 @@
+{
+  "name": "tcc.im",
+  "version": "1.0.0",
+  "description": "Personal site with Three.js/WebGL! 🍦 (https://tcc.im/)",
+  "main": "sw.js",
+  "scripts": {
+    "deploy": "aws s3 cp ~/desktop/projects/tcc.im/ s3://tcc.im/ --recursive",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timc1/tcc.im.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/timc1/tcc.im/issues"
+  },
+  "homepage": "https://github.com/timc1/tcc.im#readme"
+}
