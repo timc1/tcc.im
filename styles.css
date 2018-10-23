@@ -250,7 +250,7 @@ div.loader::after {
   height: inherit;
   width: inherit;
   background: var(--gray);
-  -webkit-mask: url(/imgs/check.svg) center bottom / contain no-repeat;
+  -webkit-mask: url(/images/check.svg) center bottom / contain no-repeat;
   transition: transform .2s var(--cubicbounce);
   transform: scale(0);
   opacity: 0;
@@ -274,7 +274,7 @@ div.loader.show.error::after {
 
 div.loader.show.error::after {
   background: var(--red);
-  -webkit-mask: url(/imgs/error.svg) center bottom / contain no-repeat;
+  -webkit-mask: url(/images/error.svg) center bottom / contain no-repeat;
 }
 
 button.submit-button {
@@ -649,13 +649,13 @@ button.button::after {
 }
 
 button.arrow-next::after {
-  -webkit-mask: url(/imgs/next-arrow.svg) center bottom / contain no-repeat;
-  mask: url(/imgs/next-arrow.svg) center bottom / contain no-repeat;
+  -webkit-mask: url(/images/next-arrow.svg) center bottom / contain no-repeat;
+  mask: url(/images/next-arrow.svg) center bottom / contain no-repeat;
 }
 
 button.send-wave::after {
-  -webkit-mask: url(/imgs/plus.svg) center bottom / contain no-repeat;
-  mask: url(/imgs/plus.svg) center bottom / contain no-repeat;
+  -webkit-mask: url(/images/plus.svg) center bottom / contain no-repeat;
+  mask: url(/images/plus.svg) center bottom / contain no-repeat;
 }
 
 
@@ -775,7 +775,6 @@ a.hover {
   cursor: ne-resize;
   color: inherit;
   transition: opacity .15s var(--cubic);
-  opacity: .8;
   outline: none;
 }
 
@@ -807,12 +806,9 @@ a.hover::after {
   transform: scaleX(0);
 }
 
-a.hover:hover, 
-a.hover:active,
 a.hover:hover::after,
 a.hover:active::after,
 a.hover:focus::after {
-  opacity: 1;
   transform: scaleX(1); 
 }
 
