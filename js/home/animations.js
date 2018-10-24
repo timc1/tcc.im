@@ -267,12 +267,25 @@
         <span class="date">${user.date}</span>
       `
 
+    const updateUserCount = () => {
+      container
+        .getElementsByClassName('user-count')[0]
+        .setAttribute(
+          'aria-label',
+          `Animation showing ${state.users.length} total website visitors.`
+        )
+      container.getElementsByClassName('count')[0].innerText = `${
+        state.users.length
+      }`
+    }
+
     if (user) {
       finishedMarkup = getMarkup(user)
       const node = document.createElement('div')
       node.className = 'user'
       node.innerHTML = getMarkup(user)
       container.getElementsByClassName('users')[0].appendChild(node)
+      updateUserCount()
       return
     }
 
@@ -288,6 +301,7 @@
       finishedMarkup += `<div class="user">${markup}</div>`
     })
     container.getElementsByClassName('users')[0].innerHTML = finishedMarkup
+    updateUserCount()
 
     // We'll do a check here even though our DB will always return a list of users.
     // Just for safety measures. 😃
@@ -380,6 +394,8 @@
         e.target.parentNode.classList.add('active')
       })
       input.addEventListener('blur', function(e) {
+        // Trim value
+        e.target.value = e.target.value.trim()
         // Remove focused class
         if (e.target.value.length === 0) {
           e.target.parentNode.classList.add('empty')
@@ -575,7 +591,7 @@
   function animateGlobeToNextLocation() {
     const { current, target } = camera.transition
     if (current <= target) {
-      const progress = easeInOutQuad(current / target)
+      const progress = easeInOutCubic(current / target)
       const {
         current: { azimuthal: currentAzimuthal, polar: currentPolar },
         target: { azimuthal: targetAzimuthal, polar: targetPolar },
@@ -711,8 +727,8 @@
       polar: targetPolarAngle,
     }
   }
-  function easeInOutQuad(t) {
-    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
   }
   function getRandomNumberBetween(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)

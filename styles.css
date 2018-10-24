@@ -524,7 +524,7 @@ div.people {
   background: #fff;
   margin: 20px; 
   display: grid;
-  grid-template-columns: var(--peoplegridmax) 80px 80px;
+  grid-template-columns: var(--peoplegridmax) 80px 80px auto;
   grid-gap: 10px;
   align-items: center;
 }
@@ -539,6 +539,48 @@ div.people::before {
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
 }
 
+div.user-count {
+  place-self: start end;
+  padding: 5px;
+  margin: -5px;
+  outline: none;
+  z-index: 1;
+}
+
+div.user-count:hover .count,
+div.user-count:focus .count,
+div.user-count:active .count {
+  transform: translateX(0); 
+}
+
+div.user-count:hover .user-type,
+div.user-count:focus .user-type,
+div.user-count:active .user-type {
+  opacity: 1;
+  transform: scaleX(1); 
+}
+
+div.user-count p {
+  margin: 0;
+  display: inline-block;
+  font-size: var(--fontsm);
+  text-align: right;
+  text-transform: uppercase;
+  transition-property: transform, opacity;
+  transition: .25s var(--cubic);
+  transform-origin: 100%;
+  cursor: default;
+}
+
+div.user-count .count {
+  transform: translateX(50px);
+}
+
+div.user-count .user-type {
+  opacity: 0;
+  transform: scaleX(0)
+}
+
 @media(max-width: 767px) {
   div.people {
     justify-content: end;
@@ -548,6 +590,11 @@ div.people::before {
 
   div.send-wave-container {
     grid-column: 2;
+  }
+  
+  div.user-count {
+    grid-row: 1;
+    grid-column: 1 / span 2;
   }
 }
 
@@ -633,7 +680,7 @@ button.button::before {
   bottom: 0;
   background: #fff;
   border: 1px solid var(--lightgray);
-  transition: transform .2s var(--cubic);
+  transition: transform .15s var(--cubic);
   transform: scale(1);
 }
 
@@ -645,7 +692,7 @@ button.button::after {
   height: 20px;
   width: 30px;
   background: var(--black);
-  transition: transform .25s var(--cubic);
+  transition: transform .15s var(--cubic);
   transform: translate(-50%, -50%);
   transform-origin: 0 0;
 }
