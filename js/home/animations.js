@@ -78,7 +78,7 @@
         setup()
       } else {
         data = fetch(
-          'https://s3-us-west-1.amazonaws.com/tcc.im-assets/tcc.im/points.json'
+          'https://s3-us-west-1.amazonaws.com/tcc.assets/points.json' //'https://s3-us-west-1.amazonaws.com/tcc.im-assets/tcc.im/points.json'
         )
           .then(response => response.json())
           .then(parsed => {

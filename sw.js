@@ -2,10 +2,10 @@ var CACHE_NAME = 'tcc-cache'
 var urlsToCache = [
   '/',
   '/styles.css',
-  '/js/three.min.js',
-  '/js/orbital-controls.js',
-  '/js/animations.js',
-  '/js/index.js',
+  '/js/external/three.min.js',
+  '/js/external/orbital-controls.js',
+  '/js/home/animations.js',
+  '/js/home/index.js',
 ]
 
 self.addEventListener('install', function(event) {

@@ -14,12 +14,14 @@ font-style: normal;
  */
 @font-face {
   font-family: 'akkurat';
+  font-display: auto;
   src: url('./fonts/akkurat-regular.ttf');
   font-weight: 100 500;
   font-style: normal;
 }
 @font-face {
   font-family: 'akkurat';
+  font-display: auto;
   src: url('./fonts/akkurat-bold.ttf');
   font-weight: 600 900;
   font-style: normal;
