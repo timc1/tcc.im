@@ -428,15 +428,16 @@
   }
   function submitForm(e) {
     e.preventDefault()
-    const form = container.getElementsByClassName('send-wave-form')[0]
-    const submitButton = form.getElementsByClassName('submit-button')[0]
-    const loader = form.getElementsByClassName('loader')[0]
+    const name = e.target.name.value
+    const message = e.target.message.value
+    const submitButton = this.getElementsByClassName('submit-button')[0]
+    const loader = this.getElementsByClassName('loader')[0]
     state.isSubmittingForm = true
     updateSpinner(loader, submitButton)
-    window.navigator.geolocation.getCurrentPosition(onSuccess, onError)
+    window.navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+      timeout: 6000,
+    })
     async function onSuccess(location) {
-      const name = e.target.name.value
-      const message = e.target.message.value
       const {
         coords: { latitude, longitude },
       } = location
@@ -476,15 +477,21 @@
               })
               state.isSubmittingForm = false
               if (error) {
-                updateSpinner(loader, submitButton, false, true)
+                updateSpinner(
+                  loader,
+                  submitButton,
+                  false,
+                  true,
+                  `Oops, something went wrong 😭. Try refreshing!`
+                )
                 // Display error message
               } else {
-                updateSpinner(loader, submitButton, true, false)
                 // Once we have a new user, we can push them onto our state.
                 // 1. Hide form after (n)ms.
                 // 2. Add user to state and gets it's position index in state.users array.
                 // 3. Add user to DOM.
                 // 4. Update currentUserIndex to be that index so user will see themselves in the next iteration.
+                updateSpinner(loader, submitButton, true, false)
                 setTimeout(() => {
                   toggleForm()
                   state.users.push(user)
@@ -499,35 +506,60 @@
                     focusUser()
                   }, 10000)
                 }, 800)
+                // Send email
+                sendNotificationEmail(true)
               }
-              // Send an email to self 😊
-              const { error: emailError, success } = await httpPost(
-                `${apiUrl}v0/email`,
-                {
-                  from: `New tcc.im visitor`,
-                  to: 'timchang.tcc@gmail.com',
-                  subject: `New Submission! <${name}>`,
-                  text: '',
-                  html: `
-                    <p>New submission from: ${name}</p>
-                    <p>Message: ${message}</p>
-                  `,
-                }
-              )
             } else {
               // Display error
-              updateSpinner(loader, submitButton, false, true)
+              updateSpinner(
+                loader,
+                submitButton,
+                false,
+                true,
+                `Can't fetch your location 😭 Try using Chrome if you are on mobile!`
+              )
             }
           } else {
             // Display error
-            updateSpinner(loader, submitButton, false, true)
+            updateSpinner(
+              loader,
+              submitButton,
+              false,
+              true,
+              `Can't fetch your location 😭 Try using Chrome if you are on mobile!`
+            )
           }
         }
       )
     }
     function onError(error) {
       state.isSubmittingForm = false
-      updateSpinner(loader, submitButton, false, true)
+      updateSpinner(
+        loader,
+        submitButton,
+        false,
+        true,
+        `Can't fetch your location 😭 Try using Chrome if you are on mobile!`
+      )
+      sendNotificationEmail(false)
+    }
+    async function sendNotificationEmail(isValid) {
+      // Send an email to self
+      const { error: emailError, success } = await httpPost(
+        `${apiUrl}v0/email`,
+        {
+          from: `New tcc.im visitor`,
+          to: 'timchang.tcc@gmail.com',
+          subject: isValid
+            ? `New Submission! <${name}>`
+            : `<${name}> location was not saved.`,
+          text: '',
+          html: `
+            <p>New submission from: ${name}</p>
+            <p>Message: ${message}</p>
+          `,
+        }
+      )
     }
   }
   function toggleForm() {
@@ -553,7 +585,11 @@
       form.getElementsByClassName('submit-button')[0].tabIndex = -1
     }
   }
-  function updateSpinner(spinner, toggler, isSuccess, isError) {
+  function updateSpinner(spinner, toggler, isSuccess, isError, errorMessage) {
+    // Remove any error notifications
+    const errorContainer = spinner.getElementsByClassName('error-message')[0]
+    errorContainer.classList.remove('show') // Reset spinner
+    spinner.classList.remove('error', 'success')
     if (state.isSubmittingForm) {
       spinner.classList.add('show')
       toggler.disabled = true
@@ -565,9 +601,12 @@
     } else if (isError) {
       spinner.classList.remove('success')
       spinner.classList.add('error')
+      errorContainer.classList.add('show')
+      errorContainer.getElementsByClassName(
+        'message'
+      )[0].innerText = errorMessage
       toggler.disabled = false
     } else {
-      spinner.classList.remove('show', 'error', 'success')
       toggler.disabled = false
     }
   }
@@ -665,9 +704,7 @@
       el.clientHeight
     )
     return { x, y }
-  }
-  // Helpers
-  // =======
+  } // ======= // Helpers
   function convertLatLngToSphereCoords(latitude, longitude) {
     const phi = (latitude * Math.PI) / 180
     const theta = ((longitude - 180) * Math.PI) / 180
@@ -682,8 +719,7 @@
     let latitude = ((x - globeWidth) / globeWidth) * -180
     let longitude = ((y - globeHeight) / globeHeight) * -90
     latitude = (latitude * Math.PI) / 180 //(latitude / 180) * Math.PI
-    longitude = (longitude * Math.PI) / 180 //(longitude / 180) * Math.PI
-    // Calculate the projected starting point
+    longitude = (longitude * Math.PI) / 180 //(longitude / 180) * Math.PI // Calculate the projected starting point
     const radius = Math.cos(longitude) * globeRadius
     const targetX = Math.cos(latitude) * radius
     const targetY = Math.sin(longitude) * globeRadius

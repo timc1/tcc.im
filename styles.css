@@ -230,6 +230,32 @@ div.loader {
   transition: .1s var(--cubic);
 }
 
+div.loader .error-message {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 250px;
+  padding: 10px;
+  margin: 0;
+  background: #fff;
+  box-shadow: var(--boxshadow);
+  opacity: 0;
+  transition-property: transform,opacity;
+  transform-origin: 0;
+  transform: scale(0) translate(-50%, 0);
+  transition: .25s var(--cubicbounce);
+}
+
+div.loader .error-message.show {
+  opacity: 1;
+  transform: scale(1) translate(-50%, -30px);
+}
+
+div.loader .error-message .message {
+  font-size: var(--fontsm);
+  color: var(--lightgray);
+}
+
 div.loader::before {
   content: '';
   position: absolute;
@@ -755,7 +781,8 @@ form.send-wave-form.show {
 }
 
 div.popup .content .carat,
-form.send-wave-form .carat {
+form.send-wave-form .carat,
+div.loader.error-message .carat {
   position: absolute;
   bottom: -5px;
   left: 50%;
