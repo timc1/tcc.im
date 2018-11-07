@@ -129,8 +129,8 @@
     // const texture = new THREE.TextureLoader().load('imgs/world-map-test.png')
 
     // Here we will create our own texture instead of loading an image.
-    const textureLoader = new THREE.TextureLoader()
-    textureLoader.setCrossOrigin(true)
+    //const textureLoader = new THREE.TextureLoader()
+    //textureLoader.setCrossOrigin(true)
 
     const canvasSize = 128
     const textureCanvas = document.createElement('canvas')
@@ -138,6 +138,7 @@
     textureCanvas.height = canvasSize
     const canvasContext = textureCanvas.getContext('2d')
     canvasContext.rect(0, 0, canvasSize, canvasSize)
+    /*
     const canvasGradient = canvasContext.createLinearGradient(
       0,
       0,
@@ -151,7 +152,8 @@
     canvasContext.fill()
 
     const texture = new THREE.Texture(textureCanvas)
-    texture.needsUpdate = true
+    */
+    //texture.needsUpdate = true
 
     const geometry = new THREE.SphereGeometry(
       globeRadius,
