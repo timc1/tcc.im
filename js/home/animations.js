@@ -150,9 +150,8 @@
     canvasGradient.addColorStop(1, '#fff')
     canvasContext.fillStyle = canvasGradient
     canvasContext.fill()
-
-    const texture = new THREE.Texture(textureCanvas)
     */
+    const texture = new THREE.Texture(textureCanvas)
     //texture.needsUpdate = true
 
     const geometry = new THREE.SphereGeometry(

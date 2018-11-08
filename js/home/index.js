@@ -1,4 +1,16 @@
 ;(function() {
+  const setupLogoAnimation = () => {
+    const logo = document.getElementsByClassName('logo')[0]
+    logo.classList.add('show')
+    const link = logo.getElementsByTagName('a')[0]
+    link.addEventListener('click', function(e) {
+      e.preventDefault()
+      logo.classList.remove('show')
+      setTimeout(() => {
+        logo.classList.add('show')
+      }, 350)
+    })
+  }
   // Check language from window.location
   const getQueryString = (field, url) => {
     const href = url ? url : window.location.href
@@ -58,5 +70,6 @@
     verse.classList.add('show')
   }
   // Enter.
-  setupLanguage()
+  setupLogoAnimation()
+  setupLanguage() // Animate logo and setup event listener to animate when clicked.
 })()
