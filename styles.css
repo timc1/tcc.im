@@ -33,6 +33,7 @@ font-style: normal;
   --basefont: akkurat,Open Sans,sans-serif;
   --red: #f9683a;
   --lightpurple: #efeef7;
+  --light: #f7fafc;
   --purple: #8b95ff;
   --superlightgray: #f3f1ff;
   --lightgray: #626177;
@@ -372,12 +373,44 @@ button.submit-button>div::after {
   transition: opacity .25s var(--cubic);
 }
 
-section.verse, section.about, footer div.footer-content {
+section.news, section.verse, section.about, footer div.footer-content {
   margin-left: 8%;
 }
 
-section.verse {
+section.news {
   margin-top: 8%;
+  max-width: 500px;
+}
+
+section.news a {
+  padding: 5px 10px 5px 0;
+  background: rgba(0,0,0,.03);
+  border-radius: 15px;
+  font-size: var(--fontsm);
+  font-weight: var(--bold);
+  color: var(--gray); 
+  transition: opacity .25s var(--cubic);
+  outline: none;
+  white-space: nowrap;
+}
+
+section.news a:hover,
+section.news a:focus {
+  opacity: .6; 
+}
+
+section.news a::before {
+  content: 'NEW';
+  padding: 4px 10px;
+  margin-right: 10px;
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+  background: var(--black);
+  color: var(--lightpurple);
+  font-weight: var(--bold)
+}
+
+section.verse {
   max-width: 500px;
   z-index: 1;
   opacity: 0;
@@ -500,10 +533,10 @@ div.popup .content>div {
     max-height: 500px;
   }
 
-  section.verse {
+  section.news {
     margin-top: 80px;
   }
-  section.verse, section.about, footer div.footer-content {
+  section.news, section.verse, section.about, footer div.footer-content {
     margin-left: 100px;
   }
 }
@@ -521,6 +554,22 @@ div.popup .content>div {
     margin-left: 40px;
     margin-right: 40px;
     max-width: 100%;
+  }
+  section.news {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+    margin-top: 40px;
+    margin-bottom: 40px;
+  } 
+  section.news a {
+    display: block;
+    border-radius: 0;
+    padding: 10px 10px 10px 0;
+  }
+  section.news a::before {
+    border-radius: 0;
+    padding: 10px; 
   }
 
   :root {
@@ -899,6 +948,9 @@ footer ul.social {
   grid-gap: 1rem;
   align-items: end;
 }
+footer ul.social a {
+  text-transform: uppercase;
+}
 
 nav {
   padding: 40px 40px 0 40px;
@@ -926,7 +978,7 @@ div.logo span {
   position: absolute;
   overflow: hidden;
   opacity: 0;
-  transform: translateX(-150px);
+  transform: translateX(-50px);
   transition-property: opacity, transform;
   transition: .25s var(--cubicbounce);
 }
@@ -946,6 +998,11 @@ div.logo span:first-child {
 div.logo.show span {
   transform: translateX(0);
   opacity: 1;
+}
+
+div.logo.hide span {
+  transform: translateX(50px);
+  opacity: 0;
 }
 
 div.logo.show span:nth-child(2) {

@@ -6,9 +6,13 @@
     link.addEventListener('click', function(e) {
       e.preventDefault()
       logo.classList.remove('show')
+      logo.classList.add('hide')
       setTimeout(() => {
-        logo.classList.add('show')
-      }, 350)
+        logo.classList.remove('hide')
+        setTimeout(() => {
+          logo.classList.add('show')
+        }, 250)
+      }, 250)
     })
   }
   // Check language from window.location
