@@ -384,7 +384,7 @@ section.news {
 
 section.news a {
   padding: 5px 10px 5px 0;
-  background: rgba(0,0,0,.03);
+  background: #f7fafc;
   border-radius: 15px;
   font-size: var(--fontsm);
   font-weight: var(--bold);
