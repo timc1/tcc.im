@@ -546,21 +546,18 @@
     }
     async function sendNotificationEmail(isValid) {
       // Send an email to self
-      const { error: emailError, success } = await httpPost(
-        `${apiUrl}v0/email`,
-        {
-          from: `New tcc.im visitor`,
-          to: 'timchang.tcc@gmail.com',
-          subject: isValid
-            ? `New Submission! <${name}>`
-            : `<${name}> location was not saved.`,
-          text: '',
-          html: `
+      const { error: emailError, success } = await httpPost(`${apiUrl}email`, {
+        from: `New tcc.im visitor`,
+        to: 'timchang.tcc@gmail.com',
+        subject: isValid
+          ? `New Submission! <${name}>`
+          : `<${name}> location was not saved.`,
+        text: '',
+        html: `
             <p>New submission from: ${name}</p>
             <p>Message: ${message}</p>
           `,
-        }
-      )
+      })
     }
   }
   function toggleForm() {
