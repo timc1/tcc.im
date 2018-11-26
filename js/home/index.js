@@ -1,20 +1,20 @@
 ;(function() {
-  const setupLogoAnimation = () => {
-    const logo = document.getElementsByClassName('logo')[0]
-    logo.classList.add('show')
-    const link = logo.getElementsByTagName('a')[0]
-    link.addEventListener('click', function(e) {
-      e.preventDefault()
-      logo.classList.remove('show')
-      logo.classList.add('hide')
-      setTimeout(() => {
-        logo.classList.remove('hide')
-        setTimeout(() => {
-          logo.classList.add('show')
-        }, 250)
-      }, 250)
-    })
-  }
+  //const setupLogoAnimation = () => {
+  //  const logo = document.getElementsByClassName('logo')[0]
+  //  logo.classList.add('show')
+  //  const link = logo.getElementsByTagName('a')[0]
+  //  link.addEventListener('click', function(e) {
+  //    e.preventDefault()
+  //    logo.classList.remove('show')
+  //    logo.classList.add('hide')
+  //    setTimeout(() => {
+  //      logo.classList.remove('hide')
+  //      setTimeout(() => {
+  //        logo.classList.add('show')
+  //      }, 250)
+  //    }, 250)
+  //  })
+  //}
   // Check language from window.location
   const getQueryString = (field, url) => {
     const href = url ? url : window.location.href
@@ -72,8 +72,6 @@
       default:
     }
     verse.classList.add('show')
-  }
-  // Enter.
-  setupLogoAnimation()
+  } //setupLogoAnimation() // Enter.
   setupLanguage() // Animate logo and setup event listener to animate when clicked.
 })()
