@@ -1,5 +1,5 @@
 ;(function() {
-  const apiUrl = 'https://api.tcc.im/' //'http://localhost:3000/'
+  const apiUrl = 'https://app.tcc.im/' //'http://localhost:3000/'
   /* Three.js globe inspired by Stripe.com/atlas project and https://codepen.io/Flamov/pen/MozgXb */
 
   // Cache DOM selector. Since we're working within our section.globe we
