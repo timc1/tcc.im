@@ -1,17 +1,3 @@
-/*
-@font-face {
-font-family: 'univers';
-src: url('./fonts/univers.ttf');
-font-weight: 100 500;
-font-style: normal;
-}
-@font-face {
-font-family: 'univers';
-src: url('./fonts/univers-bold.ttf');
-font-weight: 600 900;
-font-style: normal;
-}
- */
 @font-face {
   font-family: 'akkurat';
   font-display: auto;
@@ -19,6 +5,7 @@ font-style: normal;
   font-weight: 100 500;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'akkurat';
   font-display: auto;
@@ -32,7 +19,7 @@ font-style: normal;
   --regular: 400;
   --basefont: akkurat,Open Sans,sans-serif;
   --red: #f9683a;
-  --lightpurple: #efeef7;
+  --lightpurple: #e8eaf9;
   --light: #f7fafc;
   --purple: #8b95ff;
   --superlightgray: #f3f1ff;
@@ -41,7 +28,7 @@ font-style: normal;
   --black: rgba(15,13,32,0.99);
   --fontlg: 2.2rem;
   --fontmd: 1.1rem;
-  --fontsm: .8rem;
+  --fontsm: .9rem;
 
   --peoplegridmax: 150px;
   --cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -378,7 +365,7 @@ section.verse, section.about, footer div.footer-content {
 }
 
 section.verse {
-  margin-top: 150px;
+  margin-top: 100px;
   max-width: 500px;
   z-index: 1;
   opacity: 0;
@@ -513,7 +500,7 @@ div.popup .content>div {
     max-height: 500px;
   }
   section.verse, section.about, footer div.footer-content {
-    margin-top: 80px;
+    margin-top: 60px;
     margin-left: 40px;
     margin-right: 40px;
     max-width: 100%;
@@ -806,7 +793,6 @@ footer div.footer-content {
   display: grid;
   grid-template-columns: 381px max-content;
   grid-gap: 1rem;
-  max-width: 500px;
   margin-bottom: 40px;
   opacity: 0;
   transition: opacity .25s var(--cubic);
@@ -816,15 +802,15 @@ footer div.footer-content.show {
   opacity: 1;
 }
 
+
+
 @media(max-width: 767px) {
   footer div.footer-content {
     grid-template-columns: 1fr;
     margin-top: 40px;
   }
 
-  footer div.footer-content p {
-    font-size: var(--fontsm);
-  }
+  
   footer div.footer-content p:nth-child(3),
   footer div.footer-content p:nth-child(4),
   footer ul.social  {
@@ -834,7 +820,8 @@ footer div.footer-content.show {
 
 footer p {
   margin: 0;
-  font-size: var(--fontmd);
+  font-size: var(--fontsm);
+  line-height: 1.2rem;
   color: var(--black);
 }
 
@@ -897,6 +884,7 @@ footer ul.social {
 }
 footer ul.social a {
   text-transform: uppercase;
+  font-size: var(--fontsm);
 }
 
 nav {
@@ -911,6 +899,10 @@ nav ul.language-selectors {
   align-items: center;
   justify-content: end;
   grid-gap: 1rem;
+}
+
+nav ul.language-selectors a {
+  font-size: var(--fontsm);
 }
 
 div.logo {
